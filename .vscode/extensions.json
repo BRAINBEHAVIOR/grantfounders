@@ -1,0 +1,12 @@
+{
+  "recommendations": ["denoland.vscode-deno"]
+{
+  "recommendations": [
+    "denoland.vscode-deno",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "ms-python.python",
+    "ms-azuretools.vscode-docker"
+  ]
+}
