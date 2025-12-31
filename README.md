@@ -3,6 +3,9 @@ Federal Funding Intelligence Platform (GF-777ACE / DIOS)
 
 ## 📚 Documentation
 
+**📖 [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md)** - 🎯 **START HERE** - Complete guide to all documentation files
+
+### Quick Access:
 - **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - ⚡ Fast lookup guide with tables and quick examples
 - **[AGENTS_OVERVIEW.md](./AGENTS_OVERVIEW.md)** - 📖 Comprehensive guide to all implemented features and intelligent agents (English)
 - **[AGENTES_RESUMO.md](./AGENTES_RESUMO.md)** - 📖 Guia completo de todas as funcionalidades e agentes inteligentes (Português)
