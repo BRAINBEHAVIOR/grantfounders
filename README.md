@@ -3,10 +3,11 @@ Federal Funding Intelligence Platform (GF-777ACE / DIOS)
 
 ## 📚 Documentation
 
-- **[AGENTS_OVERVIEW.md](./AGENTS_OVERVIEW.md)** - Comprehensive guide to all implemented features and intelligent agents (English)
-- **[AGENTES_RESUMO.md](./AGENTES_RESUMO.md)** - Guia completo de todas as funcionalidades e agentes inteligentes (Português)
-- **[DEPLOYMENT_RUNBOOK.md](./DEPLOYMENT_RUNBOOK.md)** - Production deployment guide
-- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - Implementation status and changes
+- **[QUICK_REFERENCE.md](./QUICK_REFERENCE.md)** - ⚡ Fast lookup guide with tables and quick examples
+- **[AGENTS_OVERVIEW.md](./AGENTS_OVERVIEW.md)** - 📖 Comprehensive guide to all implemented features and intelligent agents (English)
+- **[AGENTES_RESUMO.md](./AGENTES_RESUMO.md)** - 📖 Guia completo de todas as funcionalidades e agentes inteligentes (Português)
+- **[DEPLOYMENT_RUNBOOK.md](./DEPLOYMENT_RUNBOOK.md)** - 🚀 Production deployment guide
+- **[IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md)** - ✅ Implementation status and changes
 
 ## 🎯 What is GrantFounders?
 
