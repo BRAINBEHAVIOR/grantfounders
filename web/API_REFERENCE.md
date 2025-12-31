@@ -1,7 +1,33 @@
 # GF-777ACE API Reference
 **Production URL:** `https://www.grantfounders.com/api`  
 **Kernel Version:** GF-777ACE-Quantum-v3.0  
-**Authentication:** Bearer token (API Key)
+**Authentication:** Bearer token (API Key) or Owner Secret
+
+---
+
+## 🔐 Authentication Methods
+
+### Method 1: API Key (Production - Client Use)
+**Recommended for:** Production applications, client integrations
+
+API keys are generated automatically when users complete Stripe checkout. Use the `Authorization` header:
+
+```
+Authorization: Bearer gf_key_abc123xyz
+```
+
+### Method 2: Owner Secret (Server-to-Server Only)
+**Recommended for:** Smoke tests, owner operations, emergency access
+
+⚠️ **NEVER expose `GF_SECRET_KEY` in frontend code or public repositories!**
+
+Use the `x-gf-secret` header with your `GF_SECRET_KEY` from environment variables:
+
+```
+x-gf-secret: your-gf-secret-key-value
+```
+
+This bypasses the Supabase API key verification and grants enterprise-level access. Usage is NOT logged to the database.
 
 ---
 
@@ -13,11 +39,17 @@ Evaluate project alignment with GrantFounders criteria using the GF-777ACE scori
 
 **Method:** `POST`  
 **Content-Type:** `application/json`  
-**Authentication:** Required (Bearer token)
+**Authentication:** Required (Bearer token OR x-gf-secret)
 
-#### Headers
+#### Headers (Option A: API Key)
 ```
 Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json
+```
+
+#### Headers (Option B: Owner Secret)
+```
+x-gf-secret: YOUR_GF_SECRET_KEY
 Content-Type: application/json
 ```
 
@@ -39,7 +71,7 @@ Content-Type: application/json
 }
 ```
 
-#### Example Request
+#### Example Request (API Key)
 ```bash
 curl -X POST https://www.grantfounders.com/api/ace/score \
   -H "Authorization: Bearer gf_key_abc123xyz" \
@@ -58,6 +90,32 @@ curl -X POST https://www.grantfounders.com/api/ace/score \
     "compliance_score": 92,
     "expected_roi": 18
   }'
+```
+
+#### Example Request (Owner Secret - PowerShell)
+```powershell
+$body = @{
+  project_name = "Rural Water Access Initiative"
+  sector = "health"
+  budget = 5000000
+  duration_months = 36
+  beneficiaries = 50000
+  esg_score = 85
+  risk_index = 25
+  execution_capacity = 90
+  scalability = 75
+  strategic_value = 88
+  compliance_score = 92
+  expected_roi = 18
+} | ConvertTo-Json
+
+Invoke-RestMethod -Uri "https://www.grantfounders.com/api/ace/score" `
+  -Method POST `
+  -Headers @{ 
+    "x-gf-secret" = $env:GF_SECRET_KEY
+    "Content-Type" = "application/json" 
+  } `
+  -Body $body
 ```
 
 ### Response
@@ -92,10 +150,25 @@ curl -X POST https://www.grantfounders.com/api/ace/score \
 
 #### Error Responses
 
-**401 Unauthorized** - Missing API Key
+**401 Unauthorized** - Missing Authentication
 ```json
 {
-  "error": "API key required"
+  "ok": false,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "Authentication required. Use x-gf-secret (owner) or Authorization Bearer (API key)"
+  }
+}
+```
+
+**403 Forbidden** - Invalid API Key
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "Invalid API key"
+  }
 }
 ```
 

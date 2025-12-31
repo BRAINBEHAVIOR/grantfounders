@@ -1,0 +1,6 @@
+# Vercel should only build from /web directory
+# Ignore everything at root except what we need
+supabase/
+.vscode/
+*.sql
+package-lock.json

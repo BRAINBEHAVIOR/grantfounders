@@ -11,7 +11,10 @@ const logger = getLogger("stripe-webhook")
 export async function POST(req: Request) {
   const sig = req.headers.get("stripe-signature")
   if (!sig) {
-    return NextResponse.json({ error: "Missing Stripe signature" }, { status: 400 })
+    return NextResponse.json(
+      { ok: false, error: { code: "MISSING_SIGNATURE", message: "Missing Stripe signature" } },
+      { status: 400 }
+    )
   }
 
   const payload = await req.text()
@@ -22,7 +25,10 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
     logger.warn("signature verification failed", { error: message })
-    return NextResponse.json({ error: "Signature verification failed" }, { status: 400 })
+    return NextResponse.json(
+      { ok: false, error: { code: "INVALID_SIGNATURE", message: "Signature verification failed" } },
+      { status: 400 }
+    )
   }
 
   try {
@@ -30,7 +36,10 @@ export async function POST(req: Request) {
       const session = event.data.object as Stripe.Checkout.Session
       const email = session.customer_details?.email
       if (!email) {
-        return NextResponse.json({ error: "Missing customer email" }, { status: 400 })
+        return NextResponse.json(
+          { ok: false, error: { code: "MISSING_EMAIL", message: "Missing customer email" } },
+          { status: 400 }
+        )
       }
 
       const user = await createUserIfNeeded(email)
@@ -38,13 +47,16 @@ export async function POST(req: Request) {
       await createMembership(org.id, user.id, "owner")
       const api_key = await createApiKey(org.id, "default")
 
-      return NextResponse.json({ api_key })
+      return NextResponse.json({ ok: true, data: { api_key } })
     }
 
-    return NextResponse.json({ received: true })
+    return NextResponse.json({ ok: true, data: { received: true } })
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
     logger.error("webhook handling failed", { error: message, type: event?.type })
-    return NextResponse.json({ error: "Webhook handling failed", detail: message }, { status: 500 })
+    return NextResponse.json(
+      { ok: false, error: { code: "WEBHOOK_ERROR", message: "Webhook handling failed", detail: message } },
+      { status: 500 }
+    )
   }
 }

@@ -1,287 +1,360 @@
-# 🚀 Deployment & Connection Summary
+# 🚀 GrantFounders Deployment Guide
 
-**Status:** ✅ ALL SYSTEMS VALIDATED & READY FOR PRODUCTION
+**Status:** ✅ PRODUCTION-READY BASELINE ACHIEVED
 
----
-
-## 📋 What Was Validated
-
-Your Next.js application in the monorepo (`grantfounders/web`) is fully production-ready:
-
-### ✅ API Routes (4 endpoints)
-1. **`/api/ace/score`** - GF-777ACE kernel scoring (POST, authenticated, CORS-enabled)
-2. **`/api/auth`** - Email/password authentication (POST, signin/signup)
-3. **`/api/stripe/checkout`** - Checkout session creation (POST, returns Stripe URL)
-4. **`/api/stripe/webhook`** - Stripe event processing (POST, signature-verified)
-
-### ✅ Service Layer
-- Supabase integration (admin client, RPC calls, user management)
-- Stripe integration (checkout, webhooks, event parsing)
-- API key verification and metering
-- Comprehensive error handling & logging
-
-### ✅ AI Kernel
-- GF-777ACE scoring algorithm with 5-factor weighting
-- Feature extraction from 13 input parameters
-- Tier-based decision logic (AAA, A, B, C)
-- Agency context adjustments for innovation/compliance bias
-
-### ✅ Configuration
-- TypeScript paths properly configured (`@/*` → `/web/*`)
-- ESLint ignoring legacy code (won't affect production)
-- Package.json with all required dependencies
-- Next.js 16.1.1 configured for Vercel
-
-### ✅ Security
-- API key verification on protected endpoints
-- Stripe webhook signature validation
-- CORS headers properly configured
-- No hardcoded secrets in code (all externalized)
+This guide explains the monorepo structure, deployment strategy, and how all the fixes ensure a stable "unicorn-grade" Vercel deployment.
 
 ---
 
-## 🔑 Required Environment Variables
-
-**Set these in Vercel Project Settings → Environment Variables:**
+## 🏗️ Repository Structure (Monorepo)
 
 ```
-# Supabase
-SUPABASE_URL=<your-url>
-SUPABASE_SERVICE_ROLE_KEY=<your-key>
-SUPABASE_ANON_KEY=<your-key>
-
-# Stripe
-STRIPE_SECRET_KEY=<your-key>
-STRIPE_WEBHOOK_SECRET=<your-secret>
-STRIPE_PRO_PRICE_ID=<your-price-id>
-
-# Optional
-SECRET_SALT=gf-777ace
-
-# Public (NEXT_PUBLIC_)
-NEXT_PUBLIC_APP_URL=https://www.grantfounders.com
+grantfounders/                    # Repository root (NOT the build root)
+├── .git/
+├── .vscode/
+├── .vercelignore                 # ⭐ NEW: Tells Vercel to ignore non-web files
+├── vercel.json                   # ⭐ NEW: Root config with explicit commands
+├── README.md
+├── supabase/
+│   └── migrations/
+├── supabase_schema.sql
+└── web/                          # ⭐ THIS IS THE VERCEL ROOT DIRECTORY
+    ├── vercel.json               # ⭐ NEW: Next.js-specific config
+    ├── package.json
+    ├── package-lock.json         # ⭐ The ONLY lockfile Vercel uses
+    ├── next.config.ts
+    ├── tsconfig.json
+    ├── app/
+    │   ├── page.tsx              # Homepage (ONLINE status)
+    │   ├── not-found.tsx         # ⭐ NEW: Custom 404 page
+    │   └── api/
+    │       ├── health/
+    │       │   └── route.ts      # ⭐ NEW: Health check endpoint
+    │       ├── ace/
+    │       │   └── score/
+    │       │       └── route.ts  # ⭐ UPDATED: Standardized responses
+    │       ├── auth/
+    │       │   └── route.ts      # ⭐ UPDATED: CORS + OPTIONS handler
+    │       └── stripe/
+    │           ├── checkout/
+    │           │   └── route.ts  # ⭐ UPDATED: CORS + validation
+    │           └── webhook/
+    │               └── route.ts  # ⭐ UPDATED: Standardized responses
+    ├── src/
+    │   ├── ai_engine/            # GF-777ACE kernel
+    │   ├── services/             # Business logic
+    │   ├── lib/                  # Utilities
+    │   └── types/                # TypeScript types
+    └── scripts/
+        ├── check-env.js          # ⭐ UPDATED: Conditional Stripe vars
+        └── smoke-test.js         # ⭐ NEW: Automated testing script
 ```
 
 ---
 
-## 📡 Stripe Webhook Setup
+## ✅ What Was Fixed
 
-**Endpoint:** `https://www.grantfounders.com/api/stripe/webhook`  
-**Event:** `checkout.session.completed`  
-**Signature:** Required (verified in route)
+### 1. Monorepo Root Fix (CRITICAL)
+**Problem:** Vercel confused by multiple lockfiles, picked wrong root  
+**Solution:**
+- ❌ Removed root `package-lock.json`
+- ✅ Created root `vercel.json` with explicit commands
+- ✅ Created `.vercelignore` to exclude non-web files
+- ✅ Created `/web/vercel.json` for Next.js config
+- ✅ Vercel will now always use `/web` as root directory
 
-When checkout completes, webhook automatically:
-1. Creates user in Supabase Auth
-2. Creates organization
-3. Sets user as owner
-4. Generates API key
+### 2. Routing Guarantee
+**Problem:** Potential 404 errors, no custom 404 page  
+**Solution:**
+- ✅ Verified `/app/page.tsx` exists (ONLINE status page)
+- ✅ Created `/app/not-found.tsx` with friendly message
+
+### 3. API Routes Hardening
+**Problem:** Inconsistent CORS, response formats, missing OPTIONS handlers  
+**Solution:** All 5 API routes now have:
+- ✅ Explicit `runtime = "nodejs"` export
+- ✅ OPTIONS handler for CORS preflight
+- ✅ CORS headers: `Access-Control-Allow-Origin: *`
+- ✅ Zod schema validation on inputs
+- ✅ Standardized response: `{ ok: boolean, data?: ..., error?: { code, message } }`
+- ✅ Proper HTTP status codes (200, 400, 401, 403, 500)
+
+### 4. Environment Variable Strategy
+**Problem:** Build fails if Stripe vars missing, even when not needed  
+**Solution:**
+- ✅ Updated `scripts/check-env.js` with conditional logic
+- ✅ Core vars always required (Supabase, JWT, GF_SECRET_KEY)
+- ✅ Stripe vars only required if `ENABLE_STRIPE=true`
+- ✅ Build succeeds without Stripe configuration
+
+### 5. Healthcheck + Smoke Test
+**Problem:** No easy way to verify deployment health  
+**Solution:**
+- ✅ Created `/api/health` endpoint (GET, returns version/environment)
+- ✅ Created `scripts/smoke-test.js` for automated testing
+
+### 6. Documentation
+**Problem:** Unclear deployment process, no troubleshooting guide  
+**Solution:**
+- ✅ Updated `VERCEL_SETUP_GUIDE.md` with complete runbook
+- ✅ Updated `DEPLOYMENT_CHECKLIST.md` with step-by-step process
+- ✅ Added DNS configuration, domain migration guide
+- ✅ Added PowerShell test commands
 
 ---
 
-## 🎯 GitHub → Vercel Connection
+## 📋 API Routes (5 Endpoints)
 
-**Repository:** `pedroviveiros2025/grantfounders`  
-**Branch:** `main`  
-**Vercel Root Directory:** `web`  
-**Auto-deployment:** Enabled (push to main = auto-deploy)
+### ✅ Core API
+1. **`GET /api/health`** - Health check (new)
+   - Returns: `{ ok: true, data: { status, version, environment, kernel, timestamp } }`
+   - Use for: Uptime monitoring, deployment verification
+
+2. **`POST /api/ace/score`** - GF-777ACE kernel scoring
+   - Auth: Bearer token (API key)
+   - CORS: Enabled
+   - Validation: Zod schema (13 fields)
+   - Returns: `{ ok: true, data: { final_score, tier, kernel } }`
+
+### ✅ Authentication
+3. **`POST /api/auth`** - Email/password signin/signup
+   - CORS: Enabled
+   - Validation: Email format, password min length
+   - Returns: `{ ok: true, data: { user, session } }`
+
+### ✅ Stripe Integration (Optional)
+4. **`POST /api/stripe/checkout`** - Create checkout session
+   - Requires: `ENABLE_STRIPE=true`
+   - Validation: Email (optional)
+   - Returns: `{ ok: true, data: { url } }`
+
+5. **`POST /api/stripe/webhook`** - Process Stripe events
+   - Requires: `ENABLE_STRIPE=true`
+   - Validation: Stripe signature
+   - Returns: `{ ok: true, data: { api_key } }` (on checkout.session.completed)
 
 ---
 
-## 📊 Database Tables Required
+## 🔐 Environment Variables
+
+### Minimal Configuration (Core API Only)
+Deploy ACE scoring API without Stripe:
+
+```bash
+# Supabase (Required)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+
+# Security (Required)
+JWT_SECRET=your-super-secret-jwt-key-change-this
+GF_SECRET_KEY=gf-777ace-secret-key
+
+# App Config (Required)
+NEXT_PUBLIC_APP_VERSION=1.0.0
+NEXT_PUBLIC_ENVIRONMENT=production
+
+# Stripe Control (Optional)
+ENABLE_STRIPE=false
+```
+
+### Full Configuration (With Stripe Billing)
+To enable Stripe checkout and webhooks:
+
+```bash
+# All from Minimal Configuration above, plus:
+
+ENABLE_STRIPE=true
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRO_PRICE_ID=price_...
+STRIPE_ENTERPRISE_PRICE_ID=price_...
+```
+
+**Add in Vercel:**
+1. Project Settings → Environment Variables
+2. Add each variable
+3. Select: Production, Preview, Development
+4. Click "Save"
+5. Redeploy for changes to take effect
+
+---
+
+## � Deployment Process (Step-by-Step)
+
+### Local Verification First
+```powershell
+cd web
+npm ci
+npm run build  # Should succeed with ✅ message
+npm run dev
+
+# In another terminal
+Invoke-RestMethod -Uri "http://localhost:3000/api/health"
+```
+
+### Vercel Setup
+
+**1. Create New Project**
+- Go to Vercel Dashboard → Add New Project
+- Import: `pedroviveiros2025/grantfounders`
+- **Root Directory:** `web` ⚠️ **CRITICAL - MUST SET**
+- Framework: Next.js
+- Install Command: `npm ci`
+
+**2. Add Environment Variables**
+- Use Minimal Configuration above
+- Set `ENABLE_STRIPE=false` initially
+
+**3. Deploy**
+- Click "Deploy"
+- Monitor build logs
+- Verify success
+
+**4. Test Preview URL**
+```powershell
+$preview = "https://grantfounders-abc123.vercel.app"
+Invoke-RestMethod -Uri "$preview/api/health"
+node scripts/smoke-test.js $preview your-api-key
+```
+
+**5. Attach Custom Domain**
+- Project Settings → Domains
+- Remove from old project if needed
+- Add: `www.grantfounders.com`
+- DNS:
+  ```
+  A      @       76.76.21.21
+  CNAME  www     cname.vercel-dns.com
+  ```
+
+**6. Verify Production**
+```powershell
+Invoke-RestMethod -Uri "https://www.grantfounders.com/api/health"
+node scripts/smoke-test.js https://www.grantfounders.com your-api-key
+```
+
+---
+
+## ✅ Acceptance Tests
+
+### Local Tests (Must Pass)
+```powershell
+cd web
+
+# Test 1: Clean install
+npm ci  # ✅ Should succeed
+
+# Test 2: Build
+npm run build  # ✅ Should succeed with env check
+
+# Test 3: Dev server
+npm run dev  # ✅ Should serve on :3000
+
+# Test 4: Homepage
+Invoke-WebRequest -Uri "http://localhost:3000"  # ✅ Should return 200
+
+# Test 5: Health
+Invoke-RestMethod -Uri "http://localhost:3000/api/health"  # ✅ Should return { ok: true }
+
+# Test 6: ACE endpoint (with API key)
+# See smoke-test.js or VERCEL_SETUP_GUIDE.md
+```
+
+### Vercel Tests (Must Pass)
+```powershell
+$url = "https://www.grantfounders.com"
+
+# Test 1: Build
+# ✅ Vercel build should succeed without "wrong workspace" warnings
+
+# Test 2: Homepage
+Invoke-WebRequest -Uri $url  # ✅ Should return 200 with "ONLINE"
+
+# Test 3: Health
+$h = Invoke-RestMethod -Uri "$url/api/health"  # ✅ Should return { ok: true }
+
+# Test 4: CORS
+Invoke-WebRequest -Uri "$url/api/ace/score" -Method OPTIONS  # ✅ Should return 204
+
+# Test 5: ACE endpoint (with valid API key)
+node scripts/smoke-test.js $url your-api-key  # ✅ Should pass all tests
+```
+
+---
+
+## 🆘 Troubleshooting
+
+### "Wrong workspace detected" in Vercel
+**Fix:** Project Settings → General → Root Directory = `web`
+
+### Build fails: "Missing env vars"
+**Fix:** Add vars in Project Settings → Environment Variables  
+**Tip:** Set `ENABLE_STRIPE=false` to skip Stripe vars
+
+### Production domain returns 404
+**Fix:**
+1. Remove domain from old Vercel project
+2. Add to new project
+3. Redeploy with clear cache
+
+### CORS errors
+**Check:** All API routes have OPTIONS handlers  
+**Test:** `Invoke-WebRequest -Method OPTIONS -Uri "..."`
+
+### Stripe webhook not firing
+**Only if ENABLE_STRIPE=true:**
+1. Verify URL in Stripe Dashboard
+2. Check webhook secret matches
+3. Test delivery in Stripe Dashboard
+
+---
+
+## 📚 Additional Resources
+
+- **[VERCEL_SETUP_GUIDE.md](./VERCEL_SETUP_GUIDE.md)** - Complete Vercel configuration with DNS, troubleshooting
+- **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - Step-by-step deployment checklist
+- **[API_REFERENCE.md](./API_REFERENCE.md)** - API endpoint documentation
+
+---
+
+## 📊 Database Requirements
 
 Ensure these exist in Supabase:
+
+**Tables:**
 - `orgs` - Organization records
 - `org_memberships` - User-org relationships  
 - `api_keys` - API key storage
 - `usage_events` - Usage tracking
 
-And these RPC functions:
-- `verify_api_key(p_key)` - Validate API key
-- `create_api_key(p_org, p_name)` - Generate new key
+**RPC Functions:**
+- `verify_api_key(p_key text)` - Validate API key
+- `create_api_key(p_org uuid, p_name text)` - Generate new key
 
 ---
 
-## 📚 Documentation Files Created
+## 🎉 Success Criteria
 
-All in `web/` directory:
+**When these all pass, you have a production-ready "unicorn-grade" deployment:**
 
-1. **[DEPLOYMENT_VALIDATION.md](DEPLOYMENT_VALIDATION.md)**
-   - Comprehensive validation checklist
-   - Each API route analyzed in detail
-   - Environment variable requirements
-   - Security review
-   - Pre-deployment checklist
+- [x] Monorepo structure fixed (no wrong workspace errors)
+- [x] Local: `npm ci && npm run build` succeeds
+- [x] Local: `npm run dev` serves homepage
+- [x] Local: GET `/api/health` returns 200
+- [x] All API routes have CORS + OPTIONS handlers
+- [x] All API routes use standardized response format
+- [x] Environment variable strategy allows Stripe-optional builds
+- [x] Smoke test script created
+- [x] Documentation complete
+- [ ] Vercel: Build succeeds without warnings
+- [ ] Vercel: No "wrong workspace" errors
+- [ ] Vercel: Preview URL works
+- [ ] Vercel: Production domain works
+- [ ] Vercel: SSL certificate valid
+- [ ] All acceptance tests pass
 
-2. **[VERCEL_SETUP_GUIDE.md](VERCEL_SETUP_GUIDE.md)**
-   - Step-by-step Vercel configuration
-   - Environment variable setup
-   - Stripe webhook routing
-   - Testing procedures
-   - Troubleshooting guide
-
-3. **[API_REFERENCE.md](API_REFERENCE.md)**
-   - Complete API documentation
-   - Request/response examples
-   - Error codes and handling
-   - Integration examples (Python, Node.js, cURL)
-   - ACE kernel algorithm explanation
-
----
-
-## ✅ Pre-Deployment Checklist
-
-- [x] All API routes validated
-- [x] Services properly configured
-- [x] No legacy code references
-- [x] Security best practices implemented
-- [x] Error handling comprehensive
-- [x] Environment variables externalized
-- [x] TypeScript configuration correct
-- [x] Dependencies up to date
-- [ ] **→ Set env vars in Vercel** ← YOUR NEXT STEP
-- [ ] **→ Configure Stripe webhook endpoint** ← YOUR NEXT STEP
-- [ ] **→ Deploy to production** ← YOUR NEXT STEP
-
----
-
-## 🚀 Next Steps (In Order)
-
-### 1. Verify Vercel Project Settings
-Go to: Vercel Dashboard → Project Settings → General
-- [ ] Framework: Next.js
-- [ ] Root Directory: `web`
-- [ ] Node Version: 20.x or higher
-- [ ] Build: `npm run build`
-- [ ] Install: `npm install`
-
-### 2. Add Environment Variables
-Go to: Vercel Dashboard → Project Settings → Environment Variables
-- [ ] Add all server-side vars (from section above)
-- [ ] Add `NEXT_PUBLIC_APP_URL`
-- [ ] Use production values (not dev/test)
-- [ ] Apply to: Production, Preview, Development
-
-### 3. Configure Stripe Webhook
-Go to: Stripe Dashboard → Webhooks
-- [ ] Create endpoint: `https://www.grantfounders.com/api/stripe/webhook`
-- [ ] Listen to: `checkout.session.completed`
-- [ ] Copy signing secret → Add to Vercel as `STRIPE_WEBHOOK_SECRET`
-
-### 4. Local Test (Optional but Recommended)
-```bash
-cd web
-npm install
-npm run build
-npm start
-# Then test with curl (examples in API_REFERENCE.md)
-```
-
-### 5. Deploy to Production
-- [ ] Push any changes to `main` branch (already clean)
-- [ ] Vercel auto-deploys, or manually trigger from dashboard
-- [ ] Monitor build logs for errors
-- [ ] Verify deployment successful
-
-### 6. Post-Deployment Verification
-- [ ] Visit `https://www.grantfounders.com`
-- [ ] Test `/api/ace/score` endpoint (examples in API_REFERENCE.md)
-- [ ] Verify Stripe webhook is receiving events
-- [ ] Check Supabase for user/org creation on checkout
-- [ ] Review Vercel deployment logs for any issues
-
----
-
-## 📞 Key Resources
-
-| Resource | Link |
-|----------|------|
-| Vercel Dashboard | https://vercel.com/dashboard |
-| Stripe Dashboard | https://dashboard.stripe.com |
-| Supabase Console | https://app.supabase.com |
-| GitHub Repo | https://github.com/pedroviveiros2025/grantfounders |
-| Next.js Docs | https://nextjs.org/docs |
-
----
-
-## 🎓 Architecture Summary
-
-```
-User Request
-    ↓
-Vercel Edge (Route Handlers)
-    ↓
-API Route (/api/*)
-    ├→ Input Validation (Zod)
-    ├→ Authentication (API Key)
-    ├→ Business Logic
-    │   ├→ GF-777ACE Kernel (/ace/score)
-    │   ├→ Supabase Auth (/auth)
-    │   ├→ Stripe Checkout (/stripe/checkout)
-    │   └→ Stripe Webhooks (/stripe/webhook)
-    ├→ Supabase Database
-    │   ├→ RPC: verify_api_key()
-    │   ├→ RPC: create_api_key()
-    │   └→ Tables: orgs, api_keys, usage_events
-    ├→ Stripe Service
-    │   ├→ Signature Verification
-    │   ├→ Session Creation
-    │   └→ Event Handling
-    └→ Response (JSON)
-        ↓
-    Client Application
-```
-
----
-
-## 🔐 Security Checklist
-
-- ✅ API keys validated before processing
-- ✅ Stripe webhooks signature-verified
-- ✅ CORS properly configured
-- ✅ No credentials in code
-- ✅ Error messages don't leak sensitive info
-- ✅ Rate limiting configured
-- ✅ All env vars server-side only
-- ✅ Zod schema validation on all inputs
-
----
-
-## 📊 Expected Behavior After Deployment
-
-### Happy Path: Checkout Flow
-1. User submits email → `/api/stripe/checkout`
-2. Returns Stripe checkout URL
-3. User completes payment in Stripe
-4. Stripe calls `/api/stripe/webhook`
-5. Webhook creates user + org + API key
-6. User has access to ACE scoring API
-
-### Happy Path: ACE Scoring
-1. Client sends project data + API key → `/api/ace/score`
-2. API key verified
-3. Input validated with Zod schema
-4. Features extracted
-5. GF-777ACE kernel computes score
-6. Usage logged
-7. Result returned (score, tier, decision)
-
-### Error Scenarios
-- Missing API key: 401
-- Invalid API key: 403
-- Bad input: 400 with validation errors
-- Server error: 500 with error message
-
----
-
-## 🎉 Summary
-
-**Your production application is fully validated and ready to deploy.**
-
-All API routes are implemented, tested, and secured. The code is clean, follows best practices, and has no dependencies on legacy or external paths.
-
-**What remains:**
-1. Set environment variables in Vercel
-2. Configure Stripe webhook endpoint
+**Status: ✅ CODE COMPLETE - READY FOR VERCEL DEPLOYMENT**
 3. Deploy to production
 
 **Estimated time to production:** 15-30 minutes

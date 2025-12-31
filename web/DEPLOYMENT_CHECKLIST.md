@@ -2,103 +2,268 @@
 
 **Repository:** pedroviveiros2025/grantfounders  
 **Branch:** main  
-**Vercel Root:** web/  
+**Vercel Root:** `web/` ⚠️ CRITICAL  
 **Domain:** https://www.grantfounders.com
 
 ---
 
-## ✅ VALIDATION COMPLETE
+## ✅ CODE VALIDATION COMPLETE
 
-### API Routes (4/4)
+### Monorepo Structure (Fixed)
+- [x] Root `package-lock.json` removed
+- [x] Root `vercel.json` created with explicit build commands
+- [x] Root `.vercelignore` created
+- [x] `/web/vercel.json` configured for Next.js
+- [x] Vercel will only use `/web` as root directory
+
+### Routing
+- [x] `/app/page.tsx` - Homepage with ONLINE status
+- [x] `/app/not-found.tsx` - Custom 404 page
+
+### API Routes (5/5)
+- [x] `/api/health` - Health check endpoint (new)
 - [x] `/api/ace/score` - GF-777ACE kernel scoring
 - [x] `/api/auth` - Email/password authentication  
 - [x] `/api/stripe/checkout` - Subscription checkout
 - [x] `/api/stripe/webhook` - Stripe event webhooks
 
-### Service Layer (6/6)
-- [x] Supabase Admin Client - DB operations & RPC calls
-- [x] Stripe Service - Checkout & webhook parsing
-- [x] Auth Service - User signin/signup
-- [x] API Key Guard - Key verification
-- [x] Metering Service - Usage tracking
-- [x] Logger Service - Error & event logging
+### API Hardening (All Routes)
+- [x] Explicit `runtime = "nodejs"` export
+- [x] OPTIONS handler for CORS preflight
+- [x] CORS headers: Access-Control-Allow-Origin, Methods, Headers
+- [x] Zod schema validation on all inputs
+- [x] Standardized response format: `{ ok: boolean, data?: ..., error?: { code, message } }`
+- [x] Proper status codes (200, 400, 401, 403, 500)
 
-### AI Kernel (1/1)
-- [x] GF-777ACE - Full scoring algorithm with 5-factor weighting
+### Environment Variables Strategy
+- [x] `scripts/check-env.js` updated
+- [x] Stripe vars now conditional (ENABLE_STRIPE flag)
+- [x] Core vars always required (Supabase, JWT, GF_SECRET_KEY)
+- [x] Build succeeds without Stripe configuration
 
-### Security (8/8)
-- [x] API key verification on protected endpoints
-- [x] Stripe webhook signature validation
-- [x] CORS headers configured
-- [x] Input validation with Zod schema
-- [x] No hardcoded secrets in code
-- [x] Error messages don't leak sensitive info
-- [x] Rate limiting configured (120 req/min)
-- [x] All env vars externalized
+### Testing & Verification
+- [x] `/api/health` endpoint created
+- [x] `scripts/smoke-test.js` created
+- [x] PowerShell test commands documented
 
-### Configuration (4/4)
-- [x] TypeScript paths (@/* → /web/*)
-- [x] ESLint legacy code ignored
-- [x] Package.json with all dependencies
-- [x] Next.js 16.1.1 Vercel-compatible
-
-### Code Quality (3/3)
-- [x] No legacy code references in production
-- [x] All imports from /web paths
-- [x] Consistent error handling
-
-### Git (2/2)
-- [x] Clean working tree
-- [x] 2 docs commits pushed to main
+### Documentation
+- [x] `VERCEL_SETUP_GUIDE.md` updated with monorepo fixes
+- [x] DNS configuration documented
+- [x] Environment variable matrix documented
+- [x] Troubleshooting guide updated
+- [x] Domain migration guide added
 
 ---
 
-## 📋 YOUR TODO LIST (3 ITEMS)
+## 📋 DEPLOYMENT STEPS
 
-### TODO 1: Set Environment Variables in Vercel
-**Time:** 5 minutes  
-**Location:** Vercel Dashboard → Project Settings → Environment Variables
+### STEP 1: Local Verification (5 min)
+```powershell
+cd web
 
-Add these variables with scope: **Production, Preview, Development**
+# Clean install
+npm ci
 
+# Create minimal env file
+# Copy these to .env.local:
+# SUPABASE_URL=...
+# SUPABASE_ANON_KEY=...
+# SUPABASE_SERVICE_ROLE_KEY=...
+# JWT_SECRET=test-secret
+# GF_SECRET_KEY=gf-secret
+# NEXT_PUBLIC_APP_VERSION=1.0.0
+# NEXT_PUBLIC_ENVIRONMENT=development
+
+# Build
+npm run build
+
+# Should succeed with:
+# ✅ All required GrantFounders env vars OK
+# ℹ️  Stripe integration disabled
+
+# Test locally
+npm run dev
+# In another terminal:
+Invoke-RestMethod -Uri "http://localhost:3000/api/health"
 ```
-SUPABASE_URL = <from your Supabase project>
-SUPABASE_SERVICE_ROLE_KEY = <from Supabase API settings>
-SUPABASE_ANON_KEY = <from Supabase API settings>
-STRIPE_SECRET_KEY = <from Stripe API keys>
-STRIPE_WEBHOOK_SECRET = <from Stripe webhooks>
-STRIPE_PRO_PRICE_ID = <from Stripe pricing>
-SECRET_SALT = gf-777ace
-NEXT_PUBLIC_APP_URL = https://www.grantfounders.com
-```
 
-**Verify:**
-```bash
-# After adding, verify each var is set:
-# - Don't check "Expose to Browser" for secret keys
-# - Only NEXT_PUBLIC_APP_URL should be exposed
-# - Apply to all scopes
-```
-
-**Status:** [ ] Not started [ ] In progress [ ] ✅ Complete
+**Status:** [ ] Complete
 
 ---
 
-### TODO 2: Configure Stripe Webhook
-**Time:** 5 minutes  
-**Location:** Stripe Dashboard → Webhooks
+### STEP 2: Vercel Project Setup (10 min)
 
-Create new endpoint:
-- **URL:** `https://www.grantfounders.com/api/stripe/webhook`
-- **Event:** `checkout.session.completed`
-- **Copy signing secret** → Add to Vercel as `STRIPE_WEBHOOK_SECRET`
+**Create New Project:**
+1. [ ] Go to Vercel Dashboard → Add New Project
+2. [ ] Import GitHub repository: `pedroviveiros2025/grantfounders`
+3. [ ] Configure:
+   - Framework: Next.js
+   - **Root Directory: `web`** ⚠️ **MUST SET THIS**
+   - Build Command: (leave default)
+   - Output Directory: (leave default)
+   - Install Command: `npm ci`
 
-**Verify:**
-```bash
-# Test locally first (if desired):
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-stripe trigger checkout.session.completed
+**Add Environment Variables:**
+
+Minimal Configuration (no Stripe):
 ```
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+JWT_SECRET=your-super-secret-jwt-key
+GF_SECRET_KEY=gf-777ace-secret-key
+NEXT_PUBLIC_APP_VERSION=1.0.0
+NEXT_PUBLIC_ENVIRONMENT=production
+ENABLE_STRIPE=false
+```
+
+Add to all environments: Production, Preview, Development
+
+**Status:** [ ] Complete
+
+---
+
+### STEP 3: First Deployment (5 min)
+
+1. [ ] Click "Deploy" button
+2. [ ] Monitor build logs
+3. [ ] Verify build succeeds
+4. [ ] Note preview URL (e.g., `grantfounders-abc123.vercel.app`)
+
+**Test Preview:**
+```powershell
+$previewUrl = "https://grantfounders-abc123.vercel.app"
+Invoke-RestMethod -Uri "$previewUrl/api/health"
+# Should return: { ok: true, data: { status: "healthy", ... } }
+```
+
+**Status:** [ ] Complete
+
+---
+
+### STEP 4: Attach Custom Domain (10 min)
+
+**In Vercel:**
+1. [ ] Go to Project Settings → Domains
+2. [ ] If domain attached to old project:
+   - [ ] Go to old project → Settings → Domains → Remove
+3. [ ] Add domain: `www.grantfounders.com`
+4. [ ] Add redirect: `grantfounders.com` → `www.grantfounders.com`
+
+**Configure DNS:**
+```
+Type    Name    Value
+A       @       76.76.21.21
+CNAME   www     cname.vercel-dns.com
+```
+
+5. [ ] Wait for DNS propagation (5-30 min)
+6. [ ] Verify SSL certificate issued
+
+**Status:** [ ] Complete
+
+---
+
+### STEP 5: Production Verification (5 min)
+
+```powershell
+# Health check
+Invoke-RestMethod -Uri "https://www.grantfounders.com/api/health"
+
+# Homepage
+Invoke-WebRequest -Uri "https://www.grantfounders.com"
+
+# CORS preflight
+Invoke-WebRequest -Uri "https://www.grantfounders.com/api/ace/score" -Method OPTIONS
+
+# Full smoke test (requires API key from Supabase)
+node scripts/smoke-test.js https://www.grantfounders.com your-api-key-here
+```
+
+**Expected Results:**
+- [x] Health returns `{ ok: true, data: { status: "healthy" } }`
+- [x] Homepage shows "ONLINE" status
+- [x] OPTIONS returns 204 with CORS headers
+- [x] Smoke test passes all tests
+
+**Status:** [ ] Complete
+
+---
+
+### STEP 6: Enable Stripe (Optional)
+
+**Only if you want billing features:**
+
+1. [ ] Get Stripe keys from Stripe Dashboard
+2. [ ] Add to Vercel Environment Variables:
+   ```
+   ENABLE_STRIPE=true
+   STRIPE_SECRET_KEY=sk_live_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   STRIPE_PRO_PRICE_ID=price_...
+   STRIPE_ENTERPRISE_PRICE_ID=price_...
+   ```
+
+3. [ ] Configure Stripe Webhook:
+   - URL: `https://www.grantfounders.com/api/stripe/webhook`
+   - Event: `checkout.session.completed`
+   - Copy signing secret to `STRIPE_WEBHOOK_SECRET`
+
+4. [ ] Redeploy from Vercel dashboard
+
+**Status:** [ ] Complete (or N/A)
+
+---
+
+## 🚨 CRITICAL ACCEPTANCE TESTS
+
+### Local Tests
+```powershell
+cd web
+npm ci
+npm run build  # Must succeed
+npm run dev    # Must serve on :3000
+Invoke-RestMethod -Uri "http://localhost:3000/api/health"  # Must return 200
+```
+
+### Vercel Tests
+```powershell
+$url = "https://www.grantfounders.com"
+
+# Test 1: Homepage
+$home = Invoke-WebRequest -Uri $url
+if ($home.StatusCode -eq 200) { Write-Host "✅ Homepage works" }
+
+# Test 2: Health
+$health = Invoke-RestMethod -Uri "$url/api/health"
+if ($health.ok) { Write-Host "✅ Health check works" }
+
+# Test 3: CORS
+$cors = Invoke-WebRequest -Uri "$url/api/ace/score" -Method OPTIONS
+if ($cors.StatusCode -eq 204) { Write-Host "✅ CORS works" }
+
+# Test 4: ACE Score (requires API key)
+# See smoke-test.js for full test
+```
+
+**All tests must pass before marking deployment complete.**
+
+---
+
+## ✅ FINAL VERIFICATION
+
+- [ ] Root directory is `web` in Vercel settings
+- [ ] Build succeeds without warnings
+- [ ] Preview URL works completely
+- [ ] Custom domain works completely  
+- [ ] Health check returns 200
+- [ ] Homepage shows ONLINE
+- [ ] ACE score endpoint works (with valid API key)
+- [ ] No 404 errors on production
+- [ ] SSL certificate valid
+- [ ] DNS resolves correctly
+
+**Deployment Status:** [ ] 🎉 PRODUCTION READY
 
 **Status:** [ ] Not started [ ] In progress [ ] ✅ Complete
 

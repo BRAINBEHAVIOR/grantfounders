@@ -24,27 +24,42 @@ function loadEnv(file) {
 loadEnv('.env.local');
 loadEnv('.env');
 
-const required = [
+// Core required vars (always needed)
+const coreRequired = [
   'SUPABASE_URL',
   'SUPABASE_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
   'JWT_SECRET',
   'GF_SECRET_KEY',
-  'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET',
-  'STRIPE_PRO_PRICE_ID',
-  'STRIPE_ENTERPRISE_PRICE_ID',
-  'NEXT_PUBLIC_API_URL',
   'NEXT_PUBLIC_APP_VERSION',
   'NEXT_PUBLIC_ENVIRONMENT'
 ];
 
+// Stripe vars (only required if ENABLE_STRIPE=true)
+const stripeVars = [
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+  'STRIPE_PRO_PRICE_ID',
+  'STRIPE_ENTERPRISE_PRICE_ID',
+];
+
+const enableStripe = process.env.ENABLE_STRIPE === 'true';
+
+const required = enableStripe ? [...coreRequired, ...stripeVars] : coreRequired;
 const missing = required.filter(k => !process.env[k]);
 
 if (missing.length) {
   console.error("❌ Missing env vars:", missing.join(", "));
+  if (!enableStripe && stripeVars.some(v => missing.includes(v))) {
+    console.log("ℹ️  Tip: Stripe vars are optional unless ENABLE_STRIPE=true");
+  }
   process.exit(1);
 } else {
-  console.log("✅ All GrantFounders env vars OK");
+  console.log("✅ All required GrantFounders env vars OK");
+  if (enableStripe) {
+    console.log("✅ Stripe integration enabled");
+  } else {
+    console.log("ℹ️  Stripe integration disabled (set ENABLE_STRIPE=true to enable)");
+  }
   process.exit(0);
 }
