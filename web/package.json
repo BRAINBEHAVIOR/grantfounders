@@ -7,7 +7,9 @@
     "build": "npm run check-env && next build",
     "start": "next start",
     "lint": "eslint",
-    "check-env": "node scripts/check-env.js"
+    "check-env": "node scripts/check-env.js",
+    "verify-deployment": "node scripts/verify-deployment.js",
+    "smoke-test": "node scripts/smoke-test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.89.0",
