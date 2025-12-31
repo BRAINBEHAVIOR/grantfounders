@@ -3,4 +3,6 @@
 supabase/
 .vscode/
 *.sql
-package-lock.json
+dios/
+# Ignore root lockfile but NOT /web/package-lock.json
+/package-lock.json
