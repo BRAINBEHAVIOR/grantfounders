@@ -49,6 +49,8 @@ export async function GET(request: Request) {
 
   try {
     // Create Supabase client for auth operations
+    // Note: We use ANON_KEY here (not SERVICE_ROLE_KEY) because we're exchanging
+    // a user's authorization code from OAuth flow
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false },
     })
@@ -80,12 +82,29 @@ export async function GET(request: Request) {
       email: data.user?.email,
     })
 
-    // Redirect to dashboard with session tokens in URL hash fragment
-    // The hash fragment is not sent to the server, so tokens are only available client-side
+    // Create response with redirect to dashboard
     const redirectUrl = new URL("/dashboard", requestUrl.origin)
-    redirectUrl.hash = `access_token=${data.session.access_token}&refresh_token=${data.session.refresh_token}`
+    const response = NextResponse.redirect(redirectUrl)
 
-    return NextResponse.redirect(redirectUrl)
+    // Set session tokens in httpOnly cookies for security
+    // These cookies will be available server-side and protected from XSS
+    const maxAge = 60 * 60 * 24 * 7 // 7 days
+    response.cookies.set("sb-access-token", data.session.access_token, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge,
+    })
+    response.cookies.set("sb-refresh-token", data.session.refresh_token, {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge,
+    })
+
+    return response
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error"
     logger.error("Unexpected error in OAuth callback", { error: message })
