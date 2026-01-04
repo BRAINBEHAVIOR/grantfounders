@@ -6,6 +6,9 @@ export const runtime = "nodejs"
 
 const logger = getLogger("auth-callback")
 
+// Session cookie duration (7 days)
+const SESSION_MAX_AGE = 60 * 60 * 24 * 7
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")
@@ -49,8 +52,10 @@ export async function GET(request: Request) {
 
   try {
     // Create Supabase client for auth operations
-    // Note: We use ANON_KEY here (not SERVICE_ROLE_KEY) because we're exchanging
-    // a user's authorization code from OAuth flow
+    // Note: We use ANON_KEY here (not SERVICE_ROLE_KEY from supabaseServer()) because:
+    // 1. OAuth code exchange requires the same key that initiated the OAuth flow (ANON_KEY)
+    // 2. SERVICE_ROLE_KEY has admin privileges and should not be used for user auth flows
+    // 3. This follows Supabase's recommended pattern for OAuth callbacks
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false },
     })
@@ -88,20 +93,19 @@ export async function GET(request: Request) {
 
     // Set session tokens in httpOnly cookies for security
     // These cookies will be available server-side and protected from XSS
-    const maxAge = 60 * 60 * 24 * 7 // 7 days
     response.cookies.set("sb-access-token", data.session.access_token, {
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge,
+      maxAge: SESSION_MAX_AGE,
     })
     response.cookies.set("sb-refresh-token", data.session.refresh_token, {
       path: "/",
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge,
+      maxAge: SESSION_MAX_AGE,
     })
 
     return response
