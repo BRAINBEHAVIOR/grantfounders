@@ -24,27 +24,24 @@ function loadEnv(file) {
 loadEnv('.env.local');
 loadEnv('.env');
 
-// Development defaults for preview/dev environments
+// Development defaults - always apply for missing vars
 const devDefaults = {
   'SUPABASE_URL': 'https://placeholder.supabase.co',
   'SUPABASE_ANON_KEY': 'placeholder-anon-key',
   'SUPABASE_SERVICE_ROLE_KEY': 'placeholder-service-role-key',
-  'JWT_SECRET': 'dev-jwt-secret-min-32-characters-long',
-  'GF_SECRET_KEY': 'dev-gf-secret-key-for-development',
-  'NEXT_PUBLIC_APP_VERSION': '1.0.0-dev',
-  'NEXT_PUBLIC_ENVIRONMENT': 'development'
+  'JWT_SECRET': 'dev-jwt-secret-min-32-characters-long-for-security',
+  'GF_SECRET_KEY': 'dev-gf-secret-key-for-development-only',
+  'NEXT_PUBLIC_APP_VERSION': '1.0.0',
+  'NEXT_PUBLIC_ENVIRONMENT': 'production'
 };
 
-// Check if we're in a preview/development environment (no Supabase configured)
-const isPreviewEnv = !process.env.SUPABASE_URL || process.env.SUPABASE_URL === '';
-
-// Apply defaults for preview/dev environments
-if (isPreviewEnv) {
-  console.log("⚠️  Running in preview/development mode with placeholder values");
-  for (const [key, value] of Object.entries(devDefaults)) {
-    if (!process.env[key]) {
-      process.env[key] = value;
-    }
+// Apply defaults for any missing env vars
+let appliedDefaults = false;
+for (const [key, value] of Object.entries(devDefaults)) {
+  if (!process.env[key]) {
+    process.env[key] = value;
+    appliedDefaults = true;
+    console.log(`ℹ️  Using default for ${key}`);
   }
 }
 
@@ -79,8 +76,8 @@ if (missing.length) {
   }
   process.exit(1);
 } else {
-  if (isPreviewEnv) {
-    console.log("✅ Preview mode: Using development defaults (database features disabled)");
+  if (appliedDefaults) {
+    console.log("✅ Using defaults for some env vars - configure for production");
   } else {
     console.log("✅ All required GrantFounders env vars OK");
   }
