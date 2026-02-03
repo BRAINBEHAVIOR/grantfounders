@@ -29,19 +29,19 @@ export function Hero() {
           {/* CTAs */}
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
             <Link
-              href="/signup"
-              className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105"
+              href="/onboarding"
+              className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105"
             >
-              Get Your Free Score
+              Analyze My Proposal Free
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
             <Link
-              href="#how-it-works"
-              className="flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-3 text-base font-medium transition-colors hover:bg-muted"
+              href="/dashboard"
+              className="flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-4 text-base font-medium transition-colors hover:bg-muted"
             >
-              See How It Works
+              View Demo Dashboard
             </Link>
           </div>
 

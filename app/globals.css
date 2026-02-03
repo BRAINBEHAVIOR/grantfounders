@@ -16,8 +16,17 @@
   --accent-foreground: #022c22;
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
+  --warning: #f59e0b;
+  --warning-foreground: #451a03;
+  --success: #10b981;
+  --success-foreground: #022c22;
+  --info: #3b82f6;
+  --info-foreground: #eff6ff;
   --ring: #10b981;
   --radius: 0.75rem;
+  --sidebar: #0d0d0d;
+  --sidebar-foreground: #fafafa;
+  --sidebar-border: #1f1f1f;
 }
 
 @theme inline {
@@ -36,7 +45,16 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
   --radius: var(--radius);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
