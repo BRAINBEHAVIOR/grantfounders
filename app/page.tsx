@@ -1,18 +1,27 @@
+import { Header } from "@/components/landing/header"
+import { Hero } from "@/components/landing/hero"
+import { Stats } from "@/components/landing/stats"
+import { Features } from "@/components/landing/features"
+import { HowItWorks } from "@/components/landing/how-it-works"
+import { Pricing } from "@/components/landing/pricing"
+import { Testimonials } from "@/components/landing/testimonials"
+import { CTA } from "@/components/landing/cta"
+import { Footer } from "@/components/landing/footer"
+
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-10 bg-background text-foreground">
-      <div className="max-w-2xl text-center space-y-6">
-        <h1 className="text-4xl font-bold tracking-tight">GrantFounders Decision API</h1>
-        <div className="space-y-2">
-          <p className="text-lg">
-            Status: <span className="font-semibold text-green-600">ONLINE</span>
-          </p>
-          <p className="text-muted-foreground">Kernel: GF-777ACE v3.0</p>
-        </div>
-        <div className="mt-8 p-4 bg-muted rounded-lg">
-          <p className="text-sm font-mono">POST /api/ace/score</p>
-        </div>
-      </div>
-    </main>
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <main>
+        <Hero />
+        <Stats />
+        <Features />
+        <HowItWorks />
+        <Testimonials />
+        <Pricing />
+        <CTA />
+      </main>
+      <Footer />
+    </div>
   )
 }
