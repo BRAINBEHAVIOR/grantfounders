@@ -1,0 +1,20 @@
+# GrantFounders ownership and review boundaries
+
+# Default owner for all repository changes
+* @BRAINBEHAVIOR
+
+# Governance, agent instructions, and repository automation
+/.github/ @BRAINBEHAVIOR
+
+# Historical-agent forensic evidence and integration gates
+/docs/agent-assets/ @BRAINBEHAVIOR
+/docs/governance/ @BRAINBEHAVIOR
+
+# Canonical application and high-risk runtime boundaries
+/web/app/api/ @BRAINBEHAVIOR
+/web/src/ @BRAINBEHAVIOR
+/web/scripts/ @BRAINBEHAVIOR
+/web/package.json @BRAINBEHAVIOR
+/web/package-lock.json @BRAINBEHAVIOR
+/supabase_schema.sql @BRAINBEHAVIOR
+/vercel.json @BRAINBEHAVIOR
