@@ -1,0 +1,145 @@
+{
+  "schemaVersion": "2.0.0",
+  "evidenceTimestamp": "2026-09-04T06:22:34Z",
+  "reporting": {
+    "repository": "BRAINBEHAVIOR/grantfounders",
+    "pullRequest": 5,
+    "branch": "copilot/copilotagent-asset-forensics-manus-pack",
+    "headShaAtInspectionStart": "aa4b06b08e2788685a9b572eb689ce5c96bb865c",
+    "baseBranch": "main",
+    "baseSha": "9074648033bdd5bc24f6721ee295818ba7b9acb4",
+    "currentMainShaAfterGovernance": "f167e7b446bdde626b28f7f1dc9acdddfb643ed1",
+    "evidenceTimestamp": "2026-09-04T06:22:34Z",
+    "inspectionLevel": "STATIC_SOURCE_AT_IMMUTABLE_SHAS"
+  },
+  "integrationGate": {
+    "status": "BLOCKED_PENDING_SOURCE_AND_TARGET_VERIFICATION",
+    "failClosed": true,
+    "ownerApproval": {
+      "status": "NOT_RECORDED",
+      "approvedPackages": [],
+      "approvedScope": null
+    },
+    "reasonCodes": [
+      "MANUS_RUNTIME_NOT_VERIFIED",
+      "DEPLOYED_DATABASE_AND_RLS_NOT_VERIFIED",
+      "CURRENT_TARGET_GAP_NOT_VERIFIED",
+      "SOURCE_PROVENANCE_CONTRACT_NOT_APPROVED",
+      "SECURITY_AND_TENANT_BOUNDARY_NOT_APPROVED",
+      "DETERMINISTIC_ACCEPTANCE_TESTS_NOT_APPROVED",
+      "ROLLBACK_BOUNDARY_NOT_APPROVED",
+      "PROHIBITED_LOGIC_PRESENT_IN_SOURCE",
+      "OWNER_APPROVAL_NOT_RECORDED"
+    ]
+  },
+  "targetContracts": [
+    {
+      "name": "canonicalGitHubSource",
+      "classification": "SOURCE_VERIFIED_TARGET_CONTRACT",
+      "repository": "BRAINBEHAVIOR/grantfounders",
+      "ref": "9074648033bdd5bc24f6721ee295818ba7b9acb4",
+      "appRoot": "web",
+      "observedStack": ["Next.js 16.1.1", "React 19.2.3", "TypeScript 5", "Supabase JS", "Stripe", "Zod"],
+      "limitations": ["runtime not executed", "live environment not inspected", "deployed database/RLS not verified"]
+    },
+    {
+      "name": "currentMainGovernanceState",
+      "classification": "SOURCE_VERIFIED_TARGET_CONTRACT",
+      "repository": "BRAINBEHAVIOR/grantfounders",
+      "ref": "f167e7b446bdde626b28f7f1dc9acdddfb643ed1",
+      "change": "governance-only child of audit baseline"
+    },
+    {
+      "name": "manusOrDeployedRuntime",
+      "classification": "NOT_VERIFIED_IN_CURRENT_TASK",
+      "repository": null,
+      "ref": null,
+      "observedStack": [],
+      "limitations": ["no claim may be made that Manus equals GitHub main"]
+    }
+  ],
+  "integrationOrder": [],
+  "candidateIntegrationOrder": ["PKG-001-FOA-SOURCE-MONITORING"],
+  "packages": [
+    {
+      "packageId": "PKG-001-FOA-SOURCE-MONITORING",
+      "status": "CANDIDATE_NOT_APPROVED",
+      "sourceAsset": "FRB-PR6-FOA-HARVESTER",
+      "reuseDecision": "REIMPLEMENT_CONCEPT_ONLY",
+      "allowedConcepts": ["source adapter contract", "source-specific pagination/rate-limit design", "normalized provenance envelope"],
+      "prohibitedSourceLogic": ["empty fallback success", "placeholder state scraper", "current hash identity", "SQLAlchemy/create_all target schema"],
+      "requiredEvidence": ["target opportunities/source/run/version tables", "existing duplicate subsystem search", "API terms and credential boundary", "source health and raw-response retention contract", "amendment lineage and idempotency contract", "failure-path and rollback tests"]
+    },
+    {
+      "packageId": "PKG-003-DECISION-TRACE-SCHEMA",
+      "status": "CANDIDATE_NOT_APPROVED",
+      "sourceAsset": "FRB-PR1",
+      "reuseDecision": "PORT_WITH_ADAPTATION",
+      "allowedConcepts": ["traceability", "immutable evaluation records", "audit metadata"],
+      "prohibitedSourceLogic": ["parallel database authority", "unproven tenant isolation", "psql-only migration copied directly"],
+      "requiredEvidence": ["current schema diff", "RLS tests", "migration/rollback plan", "data retention decision"]
+    },
+    {
+      "packageId": "PKG-004-REPORT-CONTRACT-ADAPTER",
+      "status": "CANDIDATE_NOT_APPROVED",
+      "sourceAsset": "GF-LEGACY-FRONTEND-MAIN",
+      "reuseDecision": "PORT_WITH_ADAPTATION",
+      "allowedConcepts": ["fail-closed engine proxy", "structured report completeness check"],
+      "prohibitedSourceLogic": ["parallel application root", "legacy mock run route"],
+      "requiredEvidence": ["current report contract diff", "auth/tenant contract", "timeout/error tests"]
+    },
+    {
+      "packageId": "PKG-005-ORCHESTRATION-CONTRACTS",
+      "status": "CANDIDATE_NOT_APPROVED",
+      "sourceAsset": "GF-ORCHESTRATOR-PR1",
+      "reuseDecision": "PORT_WITH_ADAPTATION",
+      "allowedConcepts": ["deterministic stage order", "strict envelope schemas", "fallback-state vocabulary"],
+      "prohibitedSourceLogic": ["representing schema-only agents as executable", "parallel runtime"],
+      "requiredEvidence": ["actual executor contract", "persistence", "auth/tenant boundary", "idempotency and state-machine tests"]
+    }
+  ],
+  "globalProhibitions": [
+    "approval_probability",
+    "win_probability",
+    "AUTO_APPROVED",
+    "automatic_pursue_pass",
+    "uncalibrated_expected_value",
+    "fabricated_rank_or_pool_size",
+    "fabricated_metrics_or_testimonials",
+    "mock_data_as_observed_government_data",
+    "positive_defaults_for_critical_unknowns",
+    "false_success_on_empty_or_failed_source",
+    "parallel_auth_org_database_report_or_billing_system",
+    "secret_value_retrieval_or_exposure"
+  ],
+  "approvalConditions": [
+    "exact source paths and symbols identified",
+    "approved and rejected fragments separated",
+    "target-runtime gap verified",
+    "target tables and contracts verified",
+    "no duplicate subsystem exists",
+    "no parallel auth/org/database/report model is created",
+    "provenance contract defined",
+    "security boundary defined",
+    "deterministic acceptance tests defined",
+    "rollback boundary defined",
+    "prohibited logic enumerated and mechanically excluded",
+    "owner/manual approval recorded"
+  ],
+  "authorizedActionsWhileBlocked": [
+    "read repository metadata and source at immutable refs",
+    "update documentation under docs/agent-assets",
+    "parse JSON and validate CSV structure",
+    "report unresolved blockers"
+  ],
+  "prohibitedActionsWhileBlocked": [
+    "modify runtime source",
+    "create or run migration",
+    "run historical agents or scrapers",
+    "call external business APIs",
+    "access secret values",
+    "deploy",
+    "merge this forensic PR",
+    "implement a candidate package"
+  ]
+}
