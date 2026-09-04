@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: web
+    env:
+      CI: "true"
+      SUPABASE_URL: http://127.0.0.1:54321
+      SUPABASE_ANON_KEY: ci-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
+      JWT_SECRET: ci-jwt-secret-not-for-production-000000000000
+      GF_SECRET_KEY: ci-gf-secret-not-for-production-000000000
+      SECRET_SALT: ci-secret-salt-not-for-production
+      NEXT_PUBLIC_APP_VERSION: ci
+      NEXT_PUBLIC_ENVIRONMENT: test
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      ENABLE_STRIPE: "false"
+      STRIPE_SECRET_KEY: sk_test_ci_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+      STRIPE_PRO_PRICE_ID: price_ci_pro
+      STRIPE_ENTERPRISE_PRICE_ID: price_ci_enterprise
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Critical dependency audit
+        run: npm audit --audit-level=critical
+
+      - name: ACE safety tests
+        run: npm run test:ace-safety
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Production build
+        run: npm run build

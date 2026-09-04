@@ -1,12 +1,14 @@
+import Link from "next/link"
+
 export default function NotFound() {
   return (
-    <main style={{ padding: 40, textAlign: 'center' }}>
+    <main style={{ padding: 40, textAlign: "center" }}>
       <h1>404 - Page Not Found</h1>
-      <p>The page you're looking for doesn't exist.</p>
+      <p>The page you requested does not exist.</p>
       <p>
-        <a href="/" style={{ color: '#0070f3', textDecoration: 'underline' }}>
+        <Link href="/" style={{ color: "#0070f3", textDecoration: "underline" }}>
           Return to Homepage
-        </a>
+        </Link>
       </p>
     </main>
   )

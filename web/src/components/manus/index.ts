@@ -11,19 +11,6 @@ export type ManusUser = {
   quota?: number
 }
 
-export const MANUS_DEMO_USER: ManusUser = {
-  id: "demo",
-  name: "Ava Quantum",
-  organization: "GrantFounders Labs",
-  plan: "pro",
-  subscription: {
-    plan: "pro",
-    monthly_evaluations_used: 0,
-    monthly_evaluations_limit: 10,
-  },
-  quota: 10,
-}
-
 export { default as Sidebar } from "./Sidebar"
 export { default as Topbar } from "./Topbar"
 export { default as Dashboard } from "./Dashboard"
