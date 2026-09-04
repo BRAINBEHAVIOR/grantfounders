@@ -1,0 +1,101 @@
+{
+  "targetRuntime": {
+    "name": "GrantFounders Premium Decision OS V1.1",
+    "stack": [
+      "React 19",
+      "Vite",
+      "Wouter",
+      "Express 4",
+      "tRPC 11",
+      "Drizzle",
+      "MySQL-compatible",
+      "Manus OAuth/JWT"
+    ],
+    "canonicalFramework": "GF-777ACE-3.1.0"
+  },
+  "integrationOrder": [
+    "PKG-001-FOA-SOURCE-MONITORING"
+  ],
+  "assets": [
+    {
+      "assetId": "FRB-PR6-FOA",
+      "capability": "OFFICIAL SOURCE MONITORING",
+      "sourceRepository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "sourceCommit": "d54febe516a392f5e5c5773303f0f36452374b8b",
+      "sourcePaths": [
+        "(path-not-yet-indexed)"
+      ],
+      "reuseDecision": "REIMPLEMENT_CONCEPT_ONLY",
+      "targetModule": "source-connectors/opportunity-ingestion",
+      "targetContract": "connector ingest -> evidenceClaims-linked opportunity records with deterministic hard-gates",
+      "requiredAdaptations": [
+        "Implement in Express 4 + tRPC 11 + Drizzle on MySQL-compatible schema",
+        "Preserve existing DecisionRun/report/audit models; no parallel runtime",
+        "Add provenance and source-health telemetry per ingested item"
+      ],
+      "prohibitedLogic": [
+        "approval_probability",
+        "win_probability",
+        "AUTO_APPROVED",
+        "positive defaults for unknown facts",
+        "hardcoded agency context as official evidence"
+      ],
+      "databaseMapping": {
+        "opportunities": "current Manus opportunity ingestion tables",
+        "evidence": "EvidenceClaims linkage",
+        "audit": "auditLogs + aiUsageEvents"
+      },
+      "testsToPort": [
+        "deterministic deduplication test",
+        "source conflict fail-closed test",
+        "provenance persistence test"
+      ],
+      "acceptanceTests": [
+        "No probability fields in output contracts",
+        "Unknown fields receive zero positive contribution",
+        "Every claim includes persisted source provenance"
+      ],
+      "dependencies": [
+        "official federal source connectors",
+        "existing Manus auth/org access-key model"
+      ],
+      "risk": "Historical source-path details still require direct extraction from PR head before implementation",
+      "rollbackBoundary": "Remove PKG-001 connector module + related migrations/contracts only"
+    },
+    {
+      "assetId": "FRB-PR1-SCHEMA",
+      "capability": "TRACEABILITY",
+      "sourceRepository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "sourceCommit": "f762c3c25111022752c60c12d1f3315694e88177",
+      "sourcePaths": [
+        "(path-not-yet-indexed)"
+      ],
+      "reuseDecision": "PORT_WITH_ADAPTATION",
+      "targetModule": "decision-run-traceability",
+      "targetContract": "stage-level traceability rows tied to immutable report versions",
+      "requiredAdaptations": [
+        "Map schema semantics into existing Drizzle models",
+        "Enforce tenant scoping through Manus OAuth/JWT organization keys"
+      ],
+      "prohibitedLogic": [
+        "parallel organization model",
+        "parallel report model",
+        "parallel database runtime"
+      ],
+      "databaseMapping": {
+        "trace": "decisionRunStageResults + reportReviews + auditLogs"
+      },
+      "testsToPort": [
+        "trace row integrity test"
+      ],
+      "acceptanceTests": [
+        "Each decision stage emits immutable trace records"
+      ],
+      "dependencies": [
+        "current Manus DB and auth contracts"
+      ],
+      "risk": "Historical table names unknown until source-path extraction",
+      "rollbackBoundary": "remove traceability extension module only"
+    }
+  ]
+}

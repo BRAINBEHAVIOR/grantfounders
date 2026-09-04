@@ -1,0 +1,243 @@
+[
+  {
+    "assetId": "GF-REPO-META-001",
+    "name": "grantfounders-repository-baseline",
+    "assetType": "repository_metadata",
+    "source": {
+      "repository": "BRAINBEHAVIOR/grantfounders",
+      "pr": null,
+      "branch": "main",
+      "commitSha": "9074648033bdd5bc24f6721ee295818ba7b9acb4",
+      "paths": [
+        "README.md",
+        "IMPLEMENTATION_SUMMARY.md",
+        "DEPLOYMENT_RUNBOOK.md",
+        "supabase_schema.sql",
+        "web/"
+      ]
+    },
+    "implementation": {
+      "status": "MERGED_AND_REACHABLE",
+      "language": ["Markdown", "SQL"],
+      "runtime": ["Repository metadata"],
+      "entrypoints": [],
+      "actualCapabilities": ["baseline evidence", "documentation lineage", "schema reference"],
+      "inputs": [],
+      "outputs": ["verified file SHAs"],
+      "reads": [],
+      "writes": [],
+      "externalDependencies": ["GitHub API"],
+      "environmentVariableNames": [],
+      "tests": {
+        "present": false,
+        "commands": [],
+        "result": "NOT_RUN",
+        "limitations": ["documentation-only evidence asset"]
+      }
+    },
+    "risks": {
+      "placeholders": [],
+      "unsupportedClaims": [],
+      "security": [],
+      "methodology": ["metadata-only snapshot; no code execution proof"],
+      "stackConflicts": []
+    },
+    "reuse": {
+      "decision": "ARCHIVE_REFERENCE",
+      "approvedCapabilities": ["forensic baseline"],
+      "rejectedComponents": [],
+      "targetModules": ["docs/agent-assets"],
+      "requiredAdaptations": [],
+      "acceptanceTests": ["SHA values match repository blobs"],
+      "priority": "P0"
+    }
+  },
+  {
+    "assetId": "FRB-PR1-SCHEMA",
+    "name": "core-schema-traceability-claim",
+    "assetType": "pr_candidate",
+    "source": {
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pr": 1,
+      "branch": "copilot/improve-database-schema-integrity",
+      "commitSha": "f762c3c25111022752c60c12d1f3315694e88177",
+      "paths": []
+    },
+    "implementation": {
+      "status": "CODE_PRESENT_UNMERGED",
+      "language": [],
+      "runtime": [],
+      "entrypoints": [],
+      "actualCapabilities": ["schema and traceability claim (metadata)", "tenant isolation claim (metadata)"],
+      "inputs": [],
+      "outputs": [],
+      "reads": [],
+      "writes": [],
+      "externalDependencies": [],
+      "environmentVariableNames": [],
+      "tests": {
+        "present": false,
+        "commands": [],
+        "result": "NOT_VERIFIED",
+        "limitations": ["source tree not inspected in this pack"]
+      }
+    },
+    "risks": {
+      "placeholders": [],
+      "unsupportedClaims": ["production readiness not proven"],
+      "security": [],
+      "methodology": ["PR title evidence only"],
+      "stackConflicts": ["Supabase-first design may require Manus adaptation"]
+    },
+    "reuse": {
+      "decision": "PORT_WITH_ADAPTATION",
+      "approvedCapabilities": ["traceability concept"],
+      "rejectedComponents": ["parallel data model without Manus contract mapping"],
+      "targetModules": ["DecisionRun traceability and audit extensions"],
+      "requiredAdaptations": ["map schema concept into Drizzle + MySQL-compatible tables"],
+      "acceptanceTests": ["deterministic trace row created for each decision stage"],
+      "priority": "P2"
+    }
+  },
+  {
+    "assetId": "FRB-PR6-FOA",
+    "name": "foa-harvester-concept",
+    "assetType": "agent_subsystem_candidate",
+    "source": {
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pr": 6,
+      "branch": "copilot/implement-opportunity-ingestion",
+      "commitSha": "d54febe516a392f5e5c5773303f0f36452374b8b",
+      "paths": []
+    },
+    "implementation": {
+      "status": "CODE_PRESENT_UNMERGED",
+      "language": [],
+      "runtime": [],
+      "entrypoints": [],
+      "actualCapabilities": ["FOA ingestion concept claim", "source monitoring claim"],
+      "inputs": ["public opportunity source feeds (claimed)"],
+      "outputs": ["opportunity records (claimed)"],
+      "reads": [],
+      "writes": [],
+      "externalDependencies": ["official federal opportunity sources (claimed)"],
+      "environmentVariableNames": [],
+      "tests": {
+        "present": false,
+        "commands": [],
+        "result": "NOT_VERIFIED",
+        "limitations": ["requires source-level inspection to verify parser completeness"]
+      }
+    },
+    "risks": {
+      "placeholders": ["parser completeness unknown"],
+      "unsupportedClaims": ["autonomous multi-source status not proven"],
+      "security": [],
+      "methodology": ["metadata-only validation"],
+      "stackConflicts": ["historical stack unknown until code inspection"]
+    },
+    "reuse": {
+      "decision": "REIMPLEMENT_CONCEPT_ONLY",
+      "approvedCapabilities": ["official-source monitoring", "deduplication concept", "freshness tracking"],
+      "rejectedComponents": ["unknown runtime-specific orchestration"],
+      "targetModules": ["source-connectors", "opportunity-ingestion scheduler"],
+      "requiredAdaptations": ["implement in Express/tRPC/Drizzle and existing DecisionRun model"],
+      "acceptanceTests": ["connector ingest test with deterministic dedup and provenance links"],
+      "priority": "P1"
+    }
+  },
+  {
+    "assetId": "FRB-PR7-AGENCYDNA",
+    "name": "agency-dna-builder-concept",
+    "assetType": "agent_subsystem_candidate",
+    "source": {
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pr": 7,
+      "branch": "copilot/construct-agency-dna-builder",
+      "commitSha": "6b4ed598c17b8d62afcbcaac54cc0a42ed18c66c",
+      "paths": []
+    },
+    "implementation": {
+      "status": "CODE_PRESENT_UNMERGED",
+      "language": [],
+      "runtime": [],
+      "entrypoints": [],
+      "actualCapabilities": ["agency behavioral intelligence claim"],
+      "inputs": [],
+      "outputs": [],
+      "reads": [],
+      "writes": [],
+      "externalDependencies": [],
+      "environmentVariableNames": [],
+      "tests": {
+        "present": false,
+        "commands": [],
+        "result": "NOT_VERIFIED",
+        "limitations": ["hardcoded context risk not yet inspected"]
+      }
+    },
+    "risks": {
+      "placeholders": [],
+      "unsupportedClaims": ["completeness not verified"],
+      "security": [],
+      "methodology": ["PR metadata only"],
+      "stackConflicts": ["must align with Manus evidence-grounded policy"]
+    },
+    "reuse": {
+      "decision": "REIMPLEMENT_CONCEPT_ONLY",
+      "approvedCapabilities": ["agency profile structure"],
+      "rejectedComponents": ["hardcoded or inferred agency context as factual truth"],
+      "targetModules": ["agency-profile service", "evidence-claims"],
+      "requiredAdaptations": ["strict provenance binding for every agency attribute"],
+      "acceptanceTests": ["unknown facts never receive positive scoring"],
+      "priority": "P2"
+    }
+  },
+  {
+    "assetId": "FRB-PR8-MATCHFORECAST",
+    "name": "match-forecast-engine-claim",
+    "assetType": "agent_subsystem_candidate",
+    "source": {
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pr": 8,
+      "branch": "copilot/create-predictive-intelligence-systems",
+      "commitSha": "f647783c8279367b171649854a9df4c50e2c1846",
+      "paths": []
+    },
+    "implementation": {
+      "status": "CODE_PRESENT_UNMERGED",
+      "language": [],
+      "runtime": [],
+      "entrypoints": [],
+      "actualCapabilities": ["predictive intelligence claim"],
+      "inputs": [],
+      "outputs": [],
+      "reads": [],
+      "writes": [],
+      "externalDependencies": [],
+      "environmentVariableNames": [],
+      "tests": {
+        "present": false,
+        "commands": [],
+        "result": "NOT_VERIFIED",
+        "limitations": ["calibration and methodology not proven"]
+      }
+    },
+    "risks": {
+      "placeholders": [],
+      "unsupportedClaims": ["forecasting effectiveness unverified"],
+      "security": [],
+      "methodology": ["risk of false precision and unsupported probabilities"],
+      "stackConflicts": ["conflicts with no-approval-probability Manus policy unless constrained"]
+    },
+    "reuse": {
+      "decision": "REJECT_LOGIC",
+      "approvedCapabilities": [],
+      "rejectedComponents": ["approval_probability", "win_probability", "AUTO_APPROVED-like flows", "uncalibrated forecasting"],
+      "targetModules": [],
+      "requiredAdaptations": ["only deterministic, evidence-grounded scoring may survive"],
+      "acceptanceTests": ["no probability fields emitted by runtime contracts"],
+      "priority": "P3"
+    }
+  }
+]
