@@ -1,243 +1,274 @@
-[
-  {
-    "assetId": "GF-REPO-META-001",
-    "name": "grantfounders-repository-baseline",
-    "assetType": "repository_metadata",
-    "source": {
+{
+  "schemaVersion": "2.0.0",
+  "evidenceTimestamp": "2026-09-04T06:22:34Z",
+  "reporting": {
+    "repository": "BRAINBEHAVIOR/grantfounders",
+    "pullRequest": 5,
+    "branch": "copilot/copilotagent-asset-forensics-manus-pack",
+    "headShaAtInspectionStart": "aa4b06b08e2788685a9b572eb689ce5c96bb865c",
+    "baseBranch": "main",
+    "baseSha": "9074648033bdd5bc24f6721ee295818ba7b9acb4",
+    "currentMainShaAfterGovernance": "f167e7b446bdde626b28f7f1dc9acdddfb643ed1",
+    "evidenceTimestamp": "2026-09-04T06:22:34Z",
+    "inspectionLevel": "STATIC_SOURCE_AT_IMMUTABLE_SHAS"
+  },
+  "inspectionConstraints": {
+    "staticOnly": true,
+    "testsRun": false,
+    "externalApisCalled": false,
+    "deploymentsPerformed": false,
+    "secretsRetrieved": false
+  },
+  "implementationStatusVocabulary": [
+    "MERGED_REACHABLE_VERIFIED",
+    "MERGED_SOURCE_PRESENT_NOT_RUNTIME_VERIFIED",
+    "UNMERGED_ENTRYPOINT_PRESENT",
+    "PARTIAL_EXECUTABLE",
+    "EXECUTABLE_PLACEHOLDER",
+    "EXECUTABLE_UNSAFE_PROTOTYPE",
+    "METADATA_ONLY",
+    "DOCUMENTATION_ONLY",
+    "ACCESSIBLE_NO_SUBSTANTIVE_IMPLEMENTATION",
+    "NOT_FOUND",
+    "INACCESSIBLE_NOT_VERIFIED"
+  ],
+  "reuseVocabulary": [
+    "PORT_AS_IS",
+    "PORT_WITH_ADAPTATION",
+    "REIMPLEMENT_CONCEPT_ONLY",
+    "ARCHIVE_REFERENCE",
+    "REJECT_LOGIC",
+    "NO_ASSET",
+    "NEEDS_MANUAL_DECISION"
+  ],
+  "assets": [
+    {
+      "assetId": "GF-CANONICAL-BASELINE",
       "repository": "BRAINBEHAVIOR/grantfounders",
-      "pr": null,
-      "branch": "main",
+      "ref": "main",
       "commitSha": "9074648033bdd5bc24f6721ee295818ba7b9acb4",
-      "paths": [
-        "README.md",
-        "IMPLEMENTATION_SUMMARY.md",
-        "DEPLOYMENT_RUNBOOK.md",
-        "supabase_schema.sql",
-        "web/"
-      ]
+      "implementationStatus": "MERGED_SOURCE_PRESENT_NOT_RUNTIME_VERIFIED",
+      "reuseDecision": "NEEDS_MANUAL_DECISION",
+      "languageRuntime": ["TypeScript", "Next.js 16", "React 19", "Node.js", "Supabase", "Stripe"],
+      "entrypoints": ["web/app/api/ace/score/route.ts::POST", "web/app/api/auth/route.ts::POST", "web/app/api/stripe/checkout/route.ts::POST", "web/app/api/stripe/webhook/route.ts::POST"],
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["ACE decision AUTO_APPROVED is score-derived", "DEFAULT_AGENCY_CONTEXT is fixed rather than observed", "actual Manus/deployed runtime not verified"],
+      "prohibitedLogic": ["AUTO_APPROVED", "fixed_agency_dna_as_observed_fact"]
     },
-    "implementation": {
-      "status": "MERGED_AND_REACHABLE",
-      "language": ["Markdown", "SQL"],
-      "runtime": ["Repository metadata"],
-      "entrypoints": [],
-      "actualCapabilities": ["baseline evidence", "documentation lineage", "schema reference"],
-      "inputs": [],
-      "outputs": ["verified file SHAs"],
-      "reads": [],
-      "writes": [],
-      "externalDependencies": ["GitHub API"],
-      "environmentVariableNames": [],
-      "tests": {
-        "present": false,
-        "commands": [],
-        "result": "NOT_RUN",
-        "limitations": ["documentation-only evidence asset"]
-      }
-    },
-    "risks": {
-      "placeholders": [],
-      "unsupportedClaims": [],
-      "security": [],
-      "methodology": ["metadata-only snapshot; no code execution proof"],
-      "stackConflicts": []
-    },
-    "reuse": {
-      "decision": "ARCHIVE_REFERENCE",
-      "approvedCapabilities": ["forensic baseline"],
-      "rejectedComponents": [],
-      "targetModules": ["docs/agent-assets"],
-      "requiredAdaptations": [],
-      "acceptanceTests": ["SHA values match repository blobs"],
-      "priority": "P0"
-    }
-  },
-  {
-    "assetId": "FRB-PR1-SCHEMA",
-    "name": "core-schema-traceability-claim",
-    "assetType": "pr_candidate",
-    "source": {
+    {
+      "assetId": "FRB-PR5-SENTINEL",
       "repository": "BRAINBEHAVIOR/federal-readiness-bot",
-      "pr": 1,
-      "branch": "copilot/improve-database-schema-integrity",
-      "commitSha": "f762c3c25111022752c60c12d1f3315694e88177",
-      "paths": []
+      "pullRequest": 5,
+      "commitSha": "a028fa64a6b1ecaf2096f1c2c8e6abc30d612381",
+      "path": "supabase/functions/sentinel/index.ts",
+      "symbols": ["monitorGrantsGov", "monitorSAMGov", "monitorUSASpending", "serve"],
+      "implementationStatus": "EXECUTABLE_PLACEHOLDER",
+      "reuseDecision": "REIMPLEMENT_CONCEPT_ONLY",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["source monitors return empty arrays", "last_successful_check may advance without retrieval", "trigger metadata is not wiring"],
+      "prohibitedLogic": ["false_success", "empty_source_success"]
     },
-    "implementation": {
-      "status": "CODE_PRESENT_UNMERGED",
-      "language": [],
-      "runtime": [],
-      "entrypoints": [],
-      "actualCapabilities": ["schema and traceability claim (metadata)", "tenant isolation claim (metadata)"],
-      "inputs": [],
-      "outputs": [],
-      "reads": [],
-      "writes": [],
-      "externalDependencies": [],
-      "environmentVariableNames": [],
-      "tests": {
-        "present": false,
-        "commands": [],
-        "result": "NOT_VERIFIED",
-        "limitations": ["source tree not inspected in this pack"]
-      }
-    },
-    "risks": {
-      "placeholders": [],
-      "unsupportedClaims": ["production readiness not proven"],
-      "security": [],
-      "methodology": ["PR title evidence only"],
-      "stackConflicts": ["Supabase-first design may require Manus adaptation"]
-    },
-    "reuse": {
-      "decision": "PORT_WITH_ADAPTATION",
-      "approvedCapabilities": ["traceability concept"],
-      "rejectedComponents": ["parallel data model without Manus contract mapping"],
-      "targetModules": ["DecisionRun traceability and audit extensions"],
-      "requiredAdaptations": ["map schema concept into Drizzle + MySQL-compatible tables"],
-      "acceptanceTests": ["deterministic trace row created for each decision stage"],
-      "priority": "P2"
-    }
-  },
-  {
-    "assetId": "FRB-PR6-FOA",
-    "name": "foa-harvester-concept",
-    "assetType": "agent_subsystem_candidate",
-    "source": {
+    {
+      "assetId": "FRB-PR5-DECODER",
       "repository": "BRAINBEHAVIOR/federal-readiness-bot",
-      "pr": 6,
-      "branch": "copilot/implement-opportunity-ingestion",
+      "pullRequest": 5,
+      "commitSha": "a028fa64a6b1ecaf2096f1c2c8e6abc30d612381",
+      "path": "supabase/functions/decoder/index.ts",
+      "symbols": ["parseOpportunityFromSignal", "parseOpportunityFromDocument", "serve"],
+      "implementationStatus": "EXECUTABLE_PLACEHOLDER",
+      "reuseDecision": "REIMPLEMENT_CONCEPT_ONLY",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["document parsing unimplemented", "GEN identifiers", "UNKNOWN/default grant/open facts", "heuristic extraction"],
+      "prohibitedLogic": ["fabricated_identifier", "positive_or_specific_defaults_for_unknown"]
+    },
+    {
+      "assetId": "FRB-PR5-PROFILER",
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pullRequest": 5,
+      "commitSha": "a028fa64a6b1ecaf2096f1c2c8e6abc30d612381",
+      "path": "supabase/functions/profiler/index.ts",
+      "symbols": ["analyzeAgencyFromUSASpending", "analyzeAgencyFromOpportunities", "extractBehaviorTraits", "identifyPreferences"],
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "REIMPLEMENT_CONCEPT_ONLY",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["USAspending path simulated", "opportunities may be relabeled as awards/obligations", "agency filtering incomplete", "unsupported confidence"],
+      "prohibitedLogic": ["simulated_as_observed", "unsupported_confidence"]
+    },
+    {
+      "assetId": "FRB-PR5-ORACLE",
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pullRequest": 5,
+      "commitSha": "a028fa64a6b1ecaf2096f1c2c8e6abc30d612381",
+      "path": "supabase/functions/oracle/index.ts",
+      "symbols": ["generateAgencyPredictions", "generateFundingForecasts", "generateTimingPredictions"],
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "REJECT_LOGIC",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["default growth", "arbitrary confidence", "fixed confidence intervals", "no calibration"],
+      "prohibitedLogic": ["uncalibrated_forecast", "arbitrary_confidence"]
+    },
+    {
+      "assetId": "FRB-PR5-RANKER",
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pullRequest": 5,
+      "commitSha": "a028fa64a6b1ecaf2096f1c2c8e6abc30d612381",
+      "path": "supabase/functions/ranker/index.ts",
+      "symbols": ["calculateEligibilityScore", "calculateCapabilityScore", "calculatePastPerformanceScore", "calculateAgencyAlignmentScore", "calculateFinancialCapacityScore", "calculateTimingScore", "scoreOpportunity"],
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "REJECT_LOGIC",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["positive defaults for absent evidence", "overall score converted to approval probability", "fabricated rank/pool size"],
+      "prohibitedLogic": ["approval_probability", "win_probability", "positive_unknown_defaults", "fabricated_rank"]
+    },
+    {
+      "assetId": "FRB-PR5-STRATEGIST",
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pullRequest": 5,
+      "commitSha": "a028fa64a6b1ecaf2096f1c2c8e6abc30d612381",
+      "path": "supabase/functions/strategist/index.ts",
+      "symbols": ["determineStrategyType", "generateObjectives", "selectTargetOpportunities", "estimateResourceRequirements", "identifyRisks", "generateActionPlan"],
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "REJECT_LOGIC",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["depends on approval_probability", "hardcoded costs/win rates/growth/risk", "unsupported estimated funding"],
+      "prohibitedLogic": ["unsupported_financial_forecast", "autonomous_strategy_from_uncalibrated_score"]
+    },
+    {
+      "assetId": "FRB-PR5-LEARNER",
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pullRequest": 5,
+      "commitSha": "a028fa64a6b1ecaf2096f1c2c8e6abc30d612381",
+      "path": "supabase/functions/learner/index.ts",
+      "symbols": ["processAwardOutcome", "evaluatePredictionAccuracy", "extractLessons", "validatePendingPredictions", "calculateModelPerformance"],
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "REJECT_LOGIC",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["constant timing validation", "circular confidence validation", "arbitrary confidence increment", "before/after can be equal"],
+      "prohibitedLogic": ["pseudo_calibration", "misleading_accuracy"]
+    },
+    {
+      "assetId": "FRB-PR6-FOA-HARVESTER",
+      "repository": "BRAINBEHAVIOR/federal-readiness-bot",
+      "pullRequest": 6,
       "commitSha": "d54febe516a392f5e5c5773303f0f36452374b8b",
-      "paths": []
+      "paths": ["src/main.py", "src/foa_harvester/pipeline.py", "src/foa_harvester/scrapers", "src/foa_harvester/processors", "src/foa_harvester/database", "tests/test_harvester.py"],
+      "implementationStatus": "PARTIAL_EXECUTABLE",
+      "reuseDecision": "REIMPLEMENT_CONCEPT_ONLY",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["days_back not propagated", "incomplete pagination", "placeholder state sources", "empty fallback false-success", "no amendment lineage", "Python/SQLAlchemy coupling"],
+      "prohibitedLogic": ["empty_source_success", "placeholder_source_as_implemented", "current_hash_as_version_lineage"]
     },
-    "implementation": {
-      "status": "CODE_PRESENT_UNMERGED",
-      "language": [],
-      "runtime": [],
-      "entrypoints": [],
-      "actualCapabilities": ["FOA ingestion concept claim", "source monitoring claim"],
-      "inputs": ["public opportunity source feeds (claimed)"],
-      "outputs": ["opportunity records (claimed)"],
-      "reads": [],
-      "writes": [],
-      "externalDependencies": ["official federal opportunity sources (claimed)"],
-      "environmentVariableNames": [],
-      "tests": {
-        "present": false,
-        "commands": [],
-        "result": "NOT_VERIFIED",
-        "limitations": ["requires source-level inspection to verify parser completeness"]
-      }
-    },
-    "risks": {
-      "placeholders": ["parser completeness unknown"],
-      "unsupportedClaims": ["autonomous multi-source status not proven"],
-      "security": [],
-      "methodology": ["metadata-only validation"],
-      "stackConflicts": ["historical stack unknown until code inspection"]
-    },
-    "reuse": {
-      "decision": "REIMPLEMENT_CONCEPT_ONLY",
-      "approvedCapabilities": ["official-source monitoring", "deduplication concept", "freshness tracking"],
-      "rejectedComponents": ["unknown runtime-specific orchestration"],
-      "targetModules": ["source-connectors", "opportunity-ingestion scheduler"],
-      "requiredAdaptations": ["implement in Express/tRPC/Drizzle and existing DecisionRun model"],
-      "acceptanceTests": ["connector ingest test with deterministic dedup and provenance links"],
-      "priority": "P1"
-    }
-  },
-  {
-    "assetId": "FRB-PR7-AGENCYDNA",
-    "name": "agency-dna-builder-concept",
-    "assetType": "agent_subsystem_candidate",
-    "source": {
+    {
+      "assetId": "FRB-PR7-AGENCY-DNA",
       "repository": "BRAINBEHAVIOR/federal-readiness-bot",
-      "pr": 7,
-      "branch": "copilot/construct-agency-dna-builder",
+      "pullRequest": 7,
       "commitSha": "6b4ed598c17b8d62afcbcaac54cc0a42ed18c66c",
-      "paths": []
+      "paths": ["src/agency_dna_builder/builder.py", "src/agency_dna_builder/connectors", "src/agency_dna_builder/analyzers"],
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "REIMPLEMENT_CONCEPT_ONLY",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["CPARS is generated mock data", "appropriations/J-Books fallback is mock", "exceptions become empty arrays", "positive data quality for missing sources"],
+      "prohibitedLogic": ["mock_data_as_agency_intelligence", "positive_quality_for_missing_data"]
     },
-    "implementation": {
-      "status": "CODE_PRESENT_UNMERGED",
-      "language": [],
-      "runtime": [],
-      "entrypoints": [],
-      "actualCapabilities": ["agency behavioral intelligence claim"],
-      "inputs": [],
-      "outputs": [],
-      "reads": [],
-      "writes": [],
-      "externalDependencies": [],
-      "environmentVariableNames": [],
-      "tests": {
-        "present": false,
-        "commands": [],
-        "result": "NOT_VERIFIED",
-        "limitations": ["hardcoded context risk not yet inspected"]
-      }
-    },
-    "risks": {
-      "placeholders": [],
-      "unsupportedClaims": ["completeness not verified"],
-      "security": [],
-      "methodology": ["PR metadata only"],
-      "stackConflicts": ["must align with Manus evidence-grounded policy"]
-    },
-    "reuse": {
-      "decision": "REIMPLEMENT_CONCEPT_ONLY",
-      "approvedCapabilities": ["agency profile structure"],
-      "rejectedComponents": ["hardcoded or inferred agency context as factual truth"],
-      "targetModules": ["agency-profile service", "evidence-claims"],
-      "requiredAdaptations": ["strict provenance binding for every agency attribute"],
-      "acceptanceTests": ["unknown facts never receive positive scoring"],
-      "priority": "P2"
-    }
-  },
-  {
-    "assetId": "FRB-PR8-MATCHFORECAST",
-    "name": "match-forecast-engine-claim",
-    "assetType": "agent_subsystem_candidate",
-    "source": {
+    {
+      "assetId": "FRB-PR8-MATCH-FORECAST",
       "repository": "BRAINBEHAVIOR/federal-readiness-bot",
-      "pr": 8,
-      "branch": "copilot/create-predictive-intelligence-systems",
+      "pullRequest": 8,
       "commitSha": "f647783c8279367b171649854a9df4c50e2c1846",
-      "paths": []
+      "path": "src/agents/match-forecast-engine.js",
+      "symbol": "MatchForecastEngine",
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "REJECT_LOGIC",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["missing evidence defaults to 0.5", "default award $100k", "default delays/costs", "uncalibrated posterior", "automatic pursue/pass"],
+      "prohibitedLogic": ["win_probability", "expected_value_from_uncalibrated_probability", "automatic_pursue_pass"]
     },
-    "implementation": {
-      "status": "CODE_PRESENT_UNMERGED",
-      "language": [],
-      "runtime": [],
-      "entrypoints": [],
-      "actualCapabilities": ["predictive intelligence claim"],
-      "inputs": [],
-      "outputs": [],
-      "reads": [],
-      "writes": [],
-      "externalDependencies": [],
-      "environmentVariableNames": [],
-      "tests": {
-        "present": false,
-        "commands": [],
-        "result": "NOT_VERIFIED",
-        "limitations": ["calibration and methodology not proven"]
-      }
+    {
+      "assetId": "GF-PR4-DEMO-PRODUCT",
+      "repository": "BRAINBEHAVIOR/grantfounders",
+      "pullRequest": 4,
+      "commitSha": "b40972eaca87ddbde13b64f9fa4dda8813d0e004",
+      "paths": ["components/landing/stats.tsx", "components/landing/testimonials.tsx", "app/dashboard/page.tsx"],
+      "implementationStatus": "EXECUTABLE_UNSAFE_PROTOTYPE",
+      "reuseDecision": "ARCHIVE_REFERENCE",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["hardcoded funding/accuracy/customer claims", "hardcoded testimonials", "simulated analysis and scores"],
+      "prohibitedLogic": ["fabricated_metrics", "fabricated_testimonials", "demo_score_as_real"]
     },
-    "risks": {
-      "placeholders": [],
-      "unsupportedClaims": ["forecasting effectiveness unverified"],
-      "security": [],
-      "methodology": ["risk of false precision and unsupported probabilities"],
-      "stackConflicts": ["conflicts with no-approval-probability Manus policy unless constrained"]
+    {
+      "assetId": "GF-ORCHESTRATOR-PR1",
+      "repository": "BRAINBEHAVIOR/gf-777ace-orchestrator",
+      "pullRequest": 1,
+      "commitSha": "16835762044fcf3c6cbc3127fb1cc913b60e919b",
+      "paths": ["src/agents/registry.ts", "src/orchestrator/plan.ts", "src/orchestrator/fallback.ts", "tests/orchestration-foundation.test.ts"],
+      "implementationStatus": "UNMERGED_ENTRYPOINT_PRESENT",
+      "reuseDecision": "PORT_WITH_ADAPTATION",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["contract/plan skeleton only", "no agent/model execution", "no persistence/auth/tenant wiring"]
     },
-    "reuse": {
-      "decision": "REJECT_LOGIC",
-      "approvedCapabilities": [],
-      "rejectedComponents": ["approval_probability", "win_probability", "AUTO_APPROVED-like flows", "uncalibrated forecasting"],
-      "targetModules": [],
-      "requiredAdaptations": ["only deterministic, evidence-grounded scoring may survive"],
-      "acceptanceTests": ["no probability fields emitted by runtime contracts"],
-      "priority": "P3"
+    {
+      "assetId": "GF-LEGACY-FRONTEND-MAIN",
+      "repository": "BRAINBEHAVIOR/grantfounders-frontend",
+      "commitSha": "fe1f229f347daa20d9bd70858d6af43fb75eca1f",
+      "paths": ["app/api/analysis/decision-report/route.ts", "lib/analysis-report.js", "app/api/run/route.ts", "app/api/scan/route.ts"],
+      "implementationStatus": "MERGED_SOURCE_PRESENT_NOT_RUNTIME_VERIFIED",
+      "reuseDecision": "PORT_WITH_ADAPTATION",
+      "sourcePresent": true,
+      "staticEntrypointPresent": true,
+      "runtimeReachable": "NOT_VERIFIED",
+      "productionReady": false,
+      "criticalFindings": ["separate older stack", "useful fail-closed report proxy", "legacy mock decision route"]
+    },
+    {
+      "assetId": "GF-BACKEND-MAIN",
+      "repository": "BRAINBEHAVIOR/grantfounders-backend",
+      "commitSha": "9bef1e57234dd402c8263e08d6b111f734671b18",
+      "implementationStatus": "ACCESSIBLE_NO_SUBSTANTIVE_IMPLEMENTATION",
+      "reuseDecision": "NO_ASSET",
+      "sourcePresent": false,
+      "staticEntrypointPresent": false,
+      "runtimeReachable": false,
+      "productionReady": false,
+      "criticalFindings": ["only .gitignore and minimal README"]
     }
-  }
-]
+  ]
+}
