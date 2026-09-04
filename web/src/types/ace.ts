@@ -1,3 +1,5 @@
+import type { EvidenceProvenanceKind } from "./agency"
+
 export type AceInput = {
   project_name: string
   sector: "gov" | "health" | "bank" | "fund"
@@ -21,12 +23,26 @@ export type AceFeatures = {
   resilience: number
 }
 
+export type ReadinessTier = "AAA" | "A" | "B" | "C"
+
+export type ReadinessBand =
+  | "HIGH_ALIGNMENT"
+  | "MODERATE_ALIGNMENT"
+  | "DEVELOPING_ALIGNMENT"
+  | "LOW_ALIGNMENT"
+
 export type AceScoreResult = {
+  contract_version: "2.0"
   ace_score: number
-  tier: "AAA" | "A" | "B" | "C"
-  decision: "AUTO_APPROVED" | "REVIEW_REQUIRED" | "CONDITIONAL_APPROVAL" | "BLOCKED"
+  tier: ReadinessTier
+  readiness_band: ReadinessBand
+  decision: "REVIEW_REQUIRED"
+  human_review_required: true
+  assessment_basis: "INTERNAL_HEURISTIC"
+  context_provenance: EvidenceProvenanceKind
   kernel: string
-  rationale?: string
+  rationale: string
+  limitations: string[]
 }
 
 export type KernelInput = AceInput

@@ -7,6 +7,8 @@
     "build": "npm run check-env && next build",
     "start": "next start",
     "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:ace-safety": "node --experimental-strip-types --test scripts/test-ace-safety.mjs",
     "check-env": "node scripts/check-env.js"
   },
   "dependencies": {

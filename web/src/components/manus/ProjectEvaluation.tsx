@@ -1,160 +1,227 @@
 "use client"
 
 import { useState, type ChangeEvent, type FormEvent } from "react"
-import { Zap, Upload, DollarSign, Users, Calendar, Tag, Target, Sparkles } from "lucide-react"
-import type { ManusUser } from "./index"
+import { AlertTriangle, CheckCircle2, ShieldCheck, Target, Zap } from "lucide-react"
+import type { AceInput, AceScoreResult } from "../../types/ace"
 
-const categories = [
-  "Technology",
-  "Healthcare",
-  "Environment",
-  "Education",
-  "Agriculture",
-  "Energy",
-  "Social Impact",
-  "Research",
-  "Arts & Culture",
-  "Other",
-]
+type FormState = {
+  project_name: string
+  sector: "" | AceInput["sector"]
+  budget: string
+  duration_months: string
+  beneficiaries: string
+  esg_score: string
+  risk_index: string
+  execution_capacity: string
+  scalability: string
+  strategic_value: string
+  compliance_score: string
+  expected_roi: string
+  apiKey: string
+}
 
-const innovationLevels = [
-  { value: "incremental", label: "Incremental Improvement" },
-  { value: "significant", label: "Significant Innovation" },
-  { value: "breakthrough", label: "Breakthrough Technology" },
-  { value: "disruptive", label: "Disruptive Innovation" },
-]
-
-type EvaluationResult = {
-  project_id: string
-  overall_score: number
-  funding_probability: number
-  confidence_level: number
-  risk_assessment: string
-  processing_time_ms: number
-  detailed_scores: Record<string, number>
-  insights: {
-    strengths: string[]
-    areas_for_improvement: string[]
-    strategic_recommendations: string[]
+type ApiErrorBody = {
+  ok?: false
+  error?: {
+    code?: string
+    message?: string
+    detail?: string
   }
-  benchmarks: {
-    similar_projects_funded: number
-    average_funding_amount: number
-    success_rate_category: number
-    percentile_ranking: number
+}
+
+type AceApiEnvelope =
+  | {
+      ok: true
+      data: AceScoreResult
+    }
+  | ApiErrorBody
+
+const initialForm: FormState = {
+  project_name: "",
+  sector: "",
+  budget: "",
+  duration_months: "",
+  beneficiaries: "",
+  esg_score: "",
+  risk_index: "",
+  execution_capacity: "",
+  scalability: "",
+  strategic_value: "",
+  compliance_score: "",
+  expected_roi: "",
+  apiKey: "",
+}
+
+const scoreFields = [
+  {
+    name: "esg_score",
+    label: "ESG score",
+    help: "Your documented assessment, from 0 to 100.",
+    min: 0,
+    max: 100,
+  },
+  {
+    name: "risk_index",
+    label: "Risk index",
+    help: "Your documented risk assessment, from 0 to 100.",
+    min: 0,
+    max: 100,
+  },
+  {
+    name: "execution_capacity",
+    label: "Execution capacity",
+    help: "Your documented delivery-capacity assessment, from 0 to 100.",
+    min: 0,
+    max: 100,
+  },
+  {
+    name: "scalability",
+    label: "Scalability",
+    help: "Your documented scalability assessment, from 0 to 100.",
+    min: 0,
+    max: 100,
+  },
+  {
+    name: "strategic_value",
+    label: "Strategic value",
+    help: "Your documented strategic-value assessment, from 0 to 100.",
+    min: 0,
+    max: 100,
+  },
+  {
+    name: "compliance_score",
+    label: "Compliance score",
+    help: "Your documented compliance assessment, from 0 to 100.",
+    min: 0,
+    max: 100,
+  },
+] as const
+
+function parseFiniteNumber(
+  raw: string,
+  label: string,
+  options: { min?: number; max?: number } = {}
+): number {
+  if (raw.trim() === "") {
+    throw new Error(`${label} is required.`)
   }
-  api_response?: unknown
+
+  const value = Number(raw)
+  if (!Number.isFinite(value)) {
+    throw new Error(`${label} must be a finite number.`)
+  }
+
+  if (options.min !== undefined && value < options.min) {
+    throw new Error(`${label} must be at least ${options.min}.`)
+  }
+
+  if (options.max !== undefined && value > options.max) {
+    throw new Error(`${label} must be at most ${options.max}.`)
+  }
+
+  return value
 }
 
-function getScoreColor(score: number) {
-  if (score >= 80) return "text-green-400"
-  if (score >= 60) return "text-yellow-400"
-  return "text-red-400"
-}
+function createPayload(form: FormState): AceInput {
+  if (!form.project_name.trim()) {
+    throw new Error("Project name is required.")
+  }
 
-function getScoreGradient(score: number) {
-  if (score >= 80) return "from-green-500 to-emerald-500"
-  if (score >= 60) return "from-yellow-500 to-orange-500"
-  return "from-red-500 to-pink-500"
-}
+  if (!form.sector) {
+    throw new Error("Sector is required.")
+  }
 
-function defaultResult(score: number, apiResponse: unknown): EvaluationResult {
   return {
-    project_id: `proj_${Date.now()}`,
-    overall_score: score,
-    funding_probability: Math.min(0.99, Math.max(0.2, score / 100)),
-    confidence_level: 0.85,
-    risk_assessment: score >= 80 ? "low" : score >= 60 ? "medium" : "high",
-    processing_time_ms: 2100,
-    detailed_scores: {
-      technical_feasibility: Math.min(100, score + 3),
-      market_potential: Math.max(50, score - 4),
-      team_capability: Math.min(100, score + 1),
-      financial_viability: Math.max(45, score - 6),
-      innovation_factor: Math.min(100, score + 5),
-      social_impact: Math.max(40, score - 8),
-    },
-    insights: {
-      strengths: [
-        "Strong technical foundation with proven methodologies",
-        "Clear market demand and target audience identification",
-        "Experienced team with relevant domain expertise",
-      ],
-      areas_for_improvement: [
-        "Expand partnership network for broader reach",
-        "Develop more detailed risk mitigation strategies",
-        "Strengthen financial projections with market validation",
-      ],
-      strategic_recommendations: [
-        "Focus on pilot program with key stakeholders",
-        "Develop intellectual property protection strategy",
-        "Create detailed go-to-market timeline",
-      ],
-    },
-    benchmarks: {
-      similar_projects_funded: 127,
-      average_funding_amount: 850_000,
-      success_rate_category: 0.68,
-      percentile_ranking: 78,
-    },
-    api_response: apiResponse,
+    project_name: form.project_name.trim(),
+    sector: form.sector,
+    budget: parseFiniteNumber(form.budget, "Budget", { min: 0 }),
+    duration_months: parseFiniteNumber(form.duration_months, "Duration", { min: 1, max: 120 }),
+    beneficiaries: parseFiniteNumber(form.beneficiaries, "Beneficiaries", { min: 0 }),
+    esg_score: parseFiniteNumber(form.esg_score, "ESG score", { min: 0, max: 100 }),
+    risk_index: parseFiniteNumber(form.risk_index, "Risk index", { min: 0, max: 100 }),
+    execution_capacity: parseFiniteNumber(form.execution_capacity, "Execution capacity", {
+      min: 0,
+      max: 100,
+    }),
+    scalability: parseFiniteNumber(form.scalability, "Scalability", { min: 0, max: 100 }),
+    strategic_value: parseFiniteNumber(form.strategic_value, "Strategic value", {
+      min: 0,
+      max: 100,
+    }),
+    compliance_score: parseFiniteNumber(form.compliance_score, "Compliance score", {
+      min: 0,
+      max: 100,
+    }),
+    expected_roi: parseFiniteNumber(form.expected_roi, "Expected ROI"),
   }
 }
 
-export default function ProjectEvaluation({ user, demoUser }: { user: ManusUser; demoUser?: ManusUser }) {
-  const [formData, setFormData] = useState({
-    project_title: "",
-    description: "",
-    budget: "",
-    duration_months: "12",
-    category: "",
-    team_size: "1",
-    keywords: "",
-    target_audience: "",
-    innovation_level: "incremental",
-    apiKey: "",
-  })
+function errorMessage(body: unknown, fallback: string): string {
+  if (!body || typeof body !== "object") return fallback
 
+  const candidate = body as ApiErrorBody
+  return candidate.error?.message || candidate.error?.detail || fallback
+}
+
+function isAceScoreResult(value: unknown): value is AceScoreResult {
+  if (!value || typeof value !== "object") return false
+
+  const result = value as Partial<AceScoreResult>
+  const validTier = result.tier === "AAA" || result.tier === "A" || result.tier === "B" || result.tier === "C"
+  const validBand =
+    result.readiness_band === "HIGH_ALIGNMENT" ||
+    result.readiness_band === "MODERATE_ALIGNMENT" ||
+    result.readiness_band === "DEVELOPING_ALIGNMENT" ||
+    result.readiness_band === "LOW_ALIGNMENT"
+
+  return (
+    result.contract_version === "2.0" &&
+    typeof result.ace_score === "number" &&
+    Number.isFinite(result.ace_score) &&
+    validTier &&
+    validBand &&
+    result.decision === "REVIEW_REQUIRED" &&
+    result.human_review_required === true &&
+    result.assessment_basis === "INTERNAL_HEURISTIC" &&
+    typeof result.context_provenance === "string" &&
+    typeof result.kernel === "string" &&
+    typeof result.rationale === "string" &&
+    Array.isArray(result.limitations) &&
+    result.limitations.every((item) => typeof item === "string")
+  )
+}
+
+function formatBand(value: AceScoreResult["readiness_band"]) {
+  return value
+    .toLowerCase()
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ")
+}
+
+export default function ProjectEvaluation() {
+  const [form, setForm] = useState<FormState>(initialForm)
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<EvaluationResult | null>(null)
+  const [result, setResult] = useState<AceScoreResult | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const quotaLimit = demoUser?.quota ?? user.subscription.monthly_evaluations_limit
-  const quotaUsed = Math.min(user.subscription.monthly_evaluations_used, quotaLimit)
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = event.target
+    setForm((current) => ({ ...current, [name]: value }))
   }
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setLoading(true)
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     setError(null)
-
-    const apiKey = formData.apiKey || process.env.NEXT_PUBLIC_API_KEY
-    if (!apiKey) {
-      setError("API key required. Add it to the form or set NEXT_PUBLIC_API_KEY.")
-      setLoading(false)
-      return
-    }
+    setLoading(true)
 
     try {
-      const payload = {
-        project_name: formData.project_title || "Untitled Project",
-        sector: "gov" as const,
-        budget: Number(formData.budget) || 0,
-        duration_months: Number(formData.duration_months) || 0,
-        beneficiaries: Math.max(10, Number(formData.team_size) * 50 || 100),
-        esg_score: 75,
-        risk_index: 25,
-        execution_capacity: 80,
-        scalability: 72,
-        strategic_value: 78,
-        compliance_score: 82,
-        expected_roi: 1.4,
+      const apiKey = form.apiKey.trim()
+      if (!apiKey) {
+        throw new Error("API key is required. It is kept only in this browser session.")
       }
 
+      const payload = createPayload(form)
       const response = await fetch("/api/ace/score", {
         method: "POST",
         headers: {
@@ -164,15 +231,19 @@ export default function ProjectEvaluation({ user, demoUser }: { user: ManusUser;
         body: JSON.stringify(payload),
       })
 
-      const data = await response.json()
-      if (!response.ok) {
-        throw new Error(data?.error || "Evaluation failed")
+      const body = (await response.json()) as AceApiEnvelope
+
+      if (!response.ok || body.ok !== true) {
+        throw new Error(errorMessage(body, "Readiness screening failed."))
       }
 
-      const score = Number(data?.ace_score ?? 0)
-      setResult(defaultResult(score, data))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err))
+      if (!isAceScoreResult(body.data)) {
+        throw new Error("The ACE API returned an unsupported response contract.")
+      }
+
+      setResult(body.data)
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : String(caught))
     } finally {
       setLoading(false)
     }
@@ -181,128 +252,81 @@ export default function ProjectEvaluation({ user, demoUser }: { user: ManusUser;
   if (result) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Evaluation Results</h1>
-            <p className="text-slate-400">AI-powered analysis powered by Abasensor™</p>
+            <h1 className="text-2xl font-bold text-white">Internal readiness screening</h1>
+            <p className="text-slate-400">
+              Owner-defined heuristic assessment. Qualified human review is always required.
+            </p>
           </div>
-          {demoUser && (
-            <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-right text-sm text-cyan-100">
-              <div className="font-semibold">Demo analysis</div>
-              <div className="text-cyan-200/80">Upgrade to unlock full intelligence</div>
-            </div>
-          )}
           <button
+            type="button"
             onClick={() => setResult(null)}
             className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white transition-colors hover:bg-slate-700"
           >
-            New Evaluation
+            New screening
           </button>
         </div>
 
-        <div className="rounded-xl border border-slate-700 bg-slate-800 p-6 text-center">
-          <div className="mb-4 inline-flex items-center space-x-2">
-            <Sparkles className="h-6 w-6 text-cyan-400" />
-            <span className="text-lg font-semibold text-white">Overall Assessment</span>
-          </div>
-          <div className={`mb-2 text-6xl font-bold ${getScoreColor(result.overall_score)}`}>
-            {result.overall_score.toFixed(1)}%
-          </div>
-          <div className="mb-4 text-slate-400">Funding Readiness Score</div>
-          <div className="flex items-center justify-center space-x-6 text-sm">
+        <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-5 text-amber-100">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
             <div>
-              <span className="text-slate-400">Funding Probability: </span>
-              <span className="font-semibold text-green-400">{Math.round(result.funding_probability * 100)}%</span>
-            </div>
-            <div>
-              <span className="text-slate-400">Confidence: </span>
-              <span className="font-semibold text-cyan-400">{Math.round(result.confidence_level * 100)}%</span>
-            </div>
-            <div>
-              <span className="text-slate-400">Processed in: </span>
-              <span className="font-semibold text-blue-400">{(result.processing_time_ms / 1000).toFixed(1)}s</span>
+              <div className="font-semibold">Not an approval or funding probability</div>
+              <p className="mt-1 text-sm text-amber-100/90">
+                This result is not a government or funder eligibility, approval, award, win-probability,
+                or funding decision.
+              </p>
             </div>
           </div>
         </div>
 
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-6 lg:col-span-2">
+            <div className="text-sm uppercase tracking-wide text-slate-400">Internal alignment score</div>
+            <div className="mt-2 text-6xl font-bold text-cyan-400">{result.ace_score}</div>
+            <div className="mt-3 text-sm text-slate-400">
+              Internal tier {result.tier} · {formatBand(result.readiness_band)}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
+            <ShieldCheck className="h-7 w-7 text-cyan-400" />
+            <div className="mt-4 text-sm uppercase tracking-wide text-slate-400">Workflow status</div>
+            <div className="mt-2 font-semibold text-white">Human review required</div>
+          </div>
+
+          <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
+            <Target className="h-7 w-7 text-blue-400" />
+            <div className="mt-4 text-sm uppercase tracking-wide text-slate-400">Evidence basis</div>
+            <div className="mt-2 font-semibold text-white">Internal heuristic</div>
+            <div className="mt-1 text-xs text-slate-400">{result.context_provenance}</div>
+          </div>
+        </div>
+
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
-          <h3 className="mb-4 text-lg font-semibold text-white">Detailed Analysis</h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {Object.entries(result.detailed_scores).map(([key, score]) => (
-              <div key={key} className="rounded-lg bg-slate-750 p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-sm text-slate-300 capitalize">{key.replace("_", " ")}</span>
-                  <span className={`font-semibold ${getScoreColor(score)}`}>{score.toFixed(1)}%</span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-slate-700">
-                  <div
-                    className={`h-2 rounded-full bg-gradient-to-r ${getScoreGradient(score)} transition-all duration-500`}
-                    style={{ width: `${score}%` }}
-                  ></div>
-                </div>
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-cyan-400" />
+            <div>
+              <h2 className="font-semibold text-white">Methodology statement</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-300">{result.rationale}</p>
+              <div className="mt-3 text-xs text-slate-500">
+                Contract {result.contract_version} · Kernel {result.kernel}
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
-            <h4 className="mb-4 text-lg font-semibold text-green-400">Strengths</h4>
-            <ul className="space-y-2">
-              {result.insights.strengths.map((strength, index) => (
-                <li key={index} className="flex items-start text-sm text-slate-300">
-                  <span className="mr-2 text-green-400">•</span>
-                  {strength}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
-            <h4 className="mb-4 text-lg font-semibold text-yellow-400">Areas for Improvement</h4>
-            <ul className="space-y-2">
-              {result.insights.areas_for_improvement.map((area, index) => (
-                <li key={index} className="flex items-start text-sm text-slate-300">
-                  <span className="mr-2 text-yellow-400">•</span>
-                  {area}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
-            <h4 className="mb-4 text-lg font-semibold text-cyan-400">Strategic Recommendations</h4>
-            <ul className="space-y-2">
-              {result.insights.strategic_recommendations.map((rec, index) => (
-                <li key={index} className="flex items-start text-sm text-slate-300">
-                  <span className="mr-2 text-cyan-400">•</span>
-                  {rec}
-                </li>
-              ))}
-            </ul>
+            </div>
           </div>
         </div>
 
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
-          <h3 className="mb-4 text-lg font-semibold text-white">Market Benchmarks</h3>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-cyan-400">{result.benchmarks.similar_projects_funded}</div>
-              <div className="text-sm text-slate-400">Similar Projects Funded</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">${(result.benchmarks.average_funding_amount / 1_000_000).toFixed(1)}M</div>
-              <div className="text-sm text-slate-400">Average Funding Amount</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400">{Math.round(result.benchmarks.success_rate_category * 100)}%</div>
-              <div className="text-sm text-slate-400">Category Success Rate</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400">{result.benchmarks.percentile_ranking}th</div>
-              <div className="text-sm text-slate-400">Percentile Ranking</div>
-            </div>
-          </div>
+          <h2 className="font-semibold text-white">Limitations</h2>
+          <ul className="mt-3 space-y-2">
+            {result.limitations.map((limitation) => (
+              <li key={limitation} className="flex items-start gap-2 text-sm text-slate-300">
+                <span className="mt-1 text-amber-400">•</span>
+                <span>{limitation}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     )
@@ -311,208 +335,181 @@ export default function ProjectEvaluation({ user, demoUser }: { user: ManusUser;
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="mb-2 text-2xl font-bold text-white">Project Evaluation</h1>
-        <p className="text-slate-400">Get AI-powered funding analysis powered by Abasensor™ technology</p>
+        <h1 className="text-2xl font-bold text-white">Internal readiness screening</h1>
+        <p className="mt-2 max-w-3xl text-slate-400">
+          Enter every scoring input directly. The system no longer invents missing project facts or
+          converts a heuristic score into a funding probability.
+        </p>
       </div>
 
-      {demoUser && (
-        <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-4 text-sm text-cyan-50">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold">Demo analysis</span>
-            <span className="text-cyan-100/80">Upgrade to unlock full intelligence</span>
-          </div>
-        </div>
-      )}
-
-      <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Zap className="h-5 w-5 text-cyan-400" />
-            <span className="font-medium text-white">Monthly Usage</span>
-          </div>
-          <div className="text-right">
-            <div className="font-semibold text-white">
-              {quotaUsed} / {quotaLimit}
-            </div>
-            <div className="text-sm text-slate-400">evaluations remaining</div>
-          </div>
-        </div>
+      <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-5 text-sm text-amber-100">
+        This screening is an internal decision-support tool. It does not determine eligibility,
+        approval, award, or likelihood of funding.
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
-          <h3 className="mb-4 text-lg font-semibold text-white">Project Information</h3>
+          <h2 className="mb-5 text-lg font-semibold text-white">Project inputs</h2>
 
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div className="lg:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-slate-300">Project Title *</label>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <div className="md:col-span-2">
+              <label htmlFor="project_name" className="mb-2 block text-sm font-medium text-slate-300">
+                Project name
+              </label>
               <input
-                type="text"
-                name="project_title"
-                value={formData.project_title}
+                id="project_name"
+                name="project_name"
+                value={form.project_name}
                 onChange={handleInputChange}
-                className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder="Enter your project title"
                 required
-              />
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-slate-300">Project Description *</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={4}
-                className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder="Describe your project..."
-                required
+                className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">Budget (USD) *</label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="number"
-                  name="budget"
-                  value={formData.budget}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 pl-10 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder="500000"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">Duration (Months)</label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="number"
-                  name="duration_months"
-                  value={formData.duration_months}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 pl-10 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  min="1"
-                  max="120"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">Category *</label>
-              <div className="relative">
-                <Tag className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 pl-10 text-white focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  required
-                >
-                  <option value="">Select category</option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat.toLowerCase()}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">Team Size</label>
-              <div className="relative">
-                <Users className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="number"
-                  name="team_size"
-                  value={formData.team_size}
-                  onChange={handleInputChange}
-                  className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 pl-10 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  min="1"
-                />
-              </div>
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-slate-300">Keywords (comma-separated)</label>
-              <input
-                type="text"
-                name="keywords"
-                value={formData.keywords}
-                onChange={handleInputChange}
-                className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder="climate, infrastructure, ai"
-              />
-            </div>
-
-            <div className="lg:col-span-2">
-              <label className="mb-2 block text-sm font-medium text-slate-300">Target Audience</label>
-              <input
-                type="text"
-                name="target_audience"
-                value={formData.target_audience}
-                onChange={handleInputChange}
-                className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                placeholder="Federal agencies, municipalities, research institutions"
-              />
-            </div>
-
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">Innovation Level</label>
+              <label htmlFor="sector" className="mb-2 block text-sm font-medium text-slate-300">
+                Sector
+              </label>
               <select
-                name="innovation_level"
-                value={formData.innovation_level}
+                id="sector"
+                name="sector"
+                value={form.sector}
                 onChange={handleInputChange}
-                className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 text-white focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                required
+                className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
               >
-                {innovationLevels.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
+                <option value="">Select sector</option>
+                <option value="gov">Government</option>
+                <option value="health">Health</option>
+                <option value="bank">Banking</option>
+                <option value="fund">Fund / philanthropy</option>
               </select>
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-300">API Key (Bearer)</label>
-              <div className="relative">
-                <Target className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <label htmlFor="budget" className="mb-2 block text-sm font-medium text-slate-300">
+                Budget (USD)
+              </label>
+              <input
+                id="budget"
+                name="budget"
+                type="number"
+                min="0"
+                step="0.01"
+                value={form.budget}
+                onChange={handleInputChange}
+                required
+                className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="duration_months" className="mb-2 block text-sm font-medium text-slate-300">
+                Duration (months)
+              </label>
+              <input
+                id="duration_months"
+                name="duration_months"
+                type="number"
+                min="1"
+                max="120"
+                value={form.duration_months}
+                onChange={handleInputChange}
+                required
+                className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="beneficiaries" className="mb-2 block text-sm font-medium text-slate-300">
+                Beneficiaries
+              </label>
+              <input
+                id="beneficiaries"
+                name="beneficiaries"
+                type="number"
+                min="0"
+                step="1"
+                value={form.beneficiaries}
+                onChange={handleInputChange}
+                required
+                className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
+              />
+            </div>
+
+            {scoreFields.map((field) => (
+              <div key={field.name}>
+                <label htmlFor={field.name} className="mb-2 block text-sm font-medium text-slate-300">
+                  {field.label}
+                </label>
                 <input
-                  type="password"
-                  name="apiKey"
-                  value={formData.apiKey}
+                  id={field.name}
+                  name={field.name}
+                  type="number"
+                  min={field.min}
+                  max={field.max}
+                  step="0.01"
+                  value={form[field.name]}
                   onChange={handleInputChange}
-                  className="w-full rounded-lg border border-slate-600 bg-slate-750 px-4 py-3 pl-10 text-white placeholder-slate-400 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  placeholder="Provide your API key"
+                  required
+                  className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
                 />
+                <p className="mt-1 text-xs text-slate-500">{field.help}</p>
               </div>
+            ))}
+
+            <div>
+              <label htmlFor="expected_roi" className="mb-2 block text-sm font-medium text-slate-300">
+                Expected ROI (%) — your estimate
+              </label>
+              <input
+                id="expected_roi"
+                name="expected_roi"
+                type="number"
+                step="0.01"
+                value={form.expected_roi}
+                onChange={handleInputChange}
+                required
+                className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="apiKey" className="mb-2 block text-sm font-medium text-slate-300">
+                API key
+              </label>
+              <input
+                id="apiKey"
+                name="apiKey"
+                type="password"
+                autoComplete="off"
+                value={form.apiKey}
+                onChange={handleInputChange}
+                required
+                placeholder="gf_key_…"
+                className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-white focus:border-cyan-500 focus:outline-none"
+              />
+              <p className="mt-1 text-xs text-slate-500">
+                The key is kept in component memory and is not loaded from a public environment variable.
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-slate-700 bg-slate-800 p-6">
-          <h3 className="mb-4 text-lg font-semibold text-white">Optional document input</h3>
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-600 bg-slate-900 p-8 text-center text-slate-400">
-            <Upload className="mb-3 h-10 w-10 text-cyan-400" />
-            <p className="font-medium text-white">Drop files here or click to upload</p>
-            <p className="text-sm text-slate-400">PDF, DOCX up to 25MB</p>
+        {error && (
+          <div role="alert" className="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-200">
+            {error}
           </div>
-        </div>
-
-        {error && <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-200">{error}</div>}
+        )}
 
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center space-x-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:from-cyan-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:from-cyan-400 hover:to-blue-400 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Evaluating with Abasensor™..." : "Evaluate Project"}
+            {loading ? <Zap className="h-5 w-5 animate-pulse" /> : <ShieldCheck className="h-5 w-5" />}
+            <span>{loading ? "Running internal screening…" : "Run internal screening"}</span>
           </button>
         </div>
       </form>

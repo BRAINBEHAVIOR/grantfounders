@@ -1,3 +1,16 @@
+export type EvidenceProvenanceKind =
+  | "OBSERVED"
+  | "DERIVED"
+  | "ESTIMATED"
+  | "SIMULATED"
+  | "INTERNAL_HEURISTIC"
+
+export type EvidenceProvenance = {
+  kind: EvidenceProvenanceKind
+  source: string
+  limitations: string[]
+}
+
 export type AgencyDNA = {
   name: string
   risk_appetite: number
@@ -15,4 +28,5 @@ export type CapabilityVector = {
 export type AgencyContext = {
   dna: AgencyDNA
   capabilities: CapabilityVector
+  provenance: EvidenceProvenance
 }
