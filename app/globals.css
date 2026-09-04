@@ -24,6 +24,9 @@
   --info-foreground: #eff6ff;
   --ring: #10b981;
   --radius: 0.75rem;
+  --sidebar: #0d0d0d;
+  --sidebar-foreground: #fafafa;
+  --sidebar-border: #1f1f1f;
 }
 
 @theme inline {
@@ -49,6 +52,9 @@
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
   --radius: var(--radius);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);

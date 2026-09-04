@@ -86,8 +86,8 @@ function Header() {
           ))}
         </div>
         <div className="hidden items-center gap-3 md:flex">
-          <Link href="/dashboard/demo" className="rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted">Demo</Link>
-          <Link href="/onboarding/demo" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">Get Started Free</Link>
+          <Link href="/dashboard" className="rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted">Demo</Link>
+          <Link href="/onboarding" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">Get Started Free</Link>
         </div>
         <button onClick={() => setOpen(!open)} className="md:hidden" aria-label="Toggle menu">
           {open ? <IconX /> : <IconMenu />}
@@ -99,8 +99,8 @@ function Header() {
             <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="block py-2 text-sm text-muted-foreground">{l.label}</a>
           ))}
           <div className="mt-4 flex flex-col gap-2">
-            <Link href="/dashboard/demo" className="rounded-lg border border-border px-4 py-2 text-center text-sm">Demo</Link>
-            <Link href="/onboarding/demo" className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground">Get Started Free</Link>
+            <Link href="/dashboard" className="rounded-lg border border-border px-4 py-2 text-center text-sm">Demo</Link>
+            <Link href="/onboarding" className="rounded-lg bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground">Get Started Free</Link>
           </div>
         </div>
       )}
@@ -130,11 +130,11 @@ function Hero() {
           Stop guessing. Start winning.
         </p>
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Link href="/onboarding/demo" className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105">
+          <Link href="/onboarding" className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105">
             Analyze My Proposal Free
             <IconArrow />
           </Link>
-          <Link href="/dashboard/demo" className="flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-4 text-base font-medium text-card-foreground transition-colors hover:bg-muted">
+          <Link href="/dashboard" className="flex items-center gap-2 rounded-lg border border-border bg-card px-6 py-4 text-base font-medium text-card-foreground transition-colors hover:bg-muted">
             View Demo Dashboard
           </Link>
         </div>
@@ -291,11 +291,11 @@ function Testimonials() {
 function Pricing() {
   const plans = [
     {
-      name: "Starter", price: "$0", period: "forever", desc: "Try the ACE engine on one proposal.", cta: "Start Free", href: "/onboarding/demo", popular: false,
+      name: "Starter", price: "$0", period: "forever", desc: "Try the ACE engine on one proposal.", cta: "Start Free", href: "/onboarding", popular: false,
       features: ["1 proposal analysis", "Overall ACE Score", "Basic risk overview", "Top 3 quick wins"],
     },
     {
-      name: "Pro", price: "$99", period: "/month", desc: "For serious founders applying to multiple grants.", cta: "Go Pro", href: "/onboarding/demo", popular: true,
+      name: "Pro", price: "$99", period: "/month", desc: "For serious founders applying to multiple grants.", cta: "Go Pro", href: "/onboarding", popular: true,
       features: ["Unlimited analyses", "Full category breakdown", "Risk matrix & heatmap", "Unlimited quick wins", "Agency DNA matching", "Competitive benchmarking", "Priority support"],
     },
     {
@@ -356,7 +356,7 @@ function CTA() {
             Join 500+ founders using AI to secure government funding. Your first analysis is completely free.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/onboarding/demo" className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105">
+            <Link href="/onboarding" className="flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-105">
               Get My Free ACE Score
               <IconArrow />
             </Link>
